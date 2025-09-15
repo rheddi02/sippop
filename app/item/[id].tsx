@@ -9,15 +9,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
+  Animated,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+// const { width } = Dimensions.get("window");
 
 export default function ItemView() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,6 +32,7 @@ export default function ItemView() {
     item.sizes.find((size) => size.isAvailable) || item.sizes[0]
   );
   const [quantity, setQuantity] = useState(1);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
 
   // Parallax animation
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -39,13 +40,20 @@ export default function ItemView() {
   const parallaxFactor = 0.5;
 
   const basePrice = selectedSize.price;
+  
+  // Calculate addon costs
+  const addonCosts = selectedAddons.reduce((total, addonName) => {
+    const addon = item.addOns?.find(addon => addon.name === addonName);
+    return total + (addon?.price || 0);
+  }, 0);
 
-  const totalPrice = basePrice * quantity;
+  const totalPrice = (basePrice + addonCosts) * quantity;
 
   const handleAddToCart = () => {
+    const addonNames = selectedAddons.length > 0 ? ` + ${selectedAddons.join(', ')}` : '';
     addToCart({
-      id: `${item.id}-${selectedSize.name}`,
-      name: `${item.name} (${selectedSize.name})`,
+      id: `${item.id}-${selectedSize.name}${selectedAddons.length > 0 ? `-${selectedAddons.join('-')}` : ''}`,
+      name: `${item.name} (${selectedSize.name})${addonNames}`,
       price: totalPrice,
       points: item.points,
     });
@@ -54,6 +62,14 @@ export default function ItemView() {
 
   const handleToggleFavorite = () => {
     toggleFavorite(item.id);
+  };
+
+  const handleToggleAddon = (addonName: string) => {
+    setSelectedAddons(prev => 
+      prev.includes(addonName) 
+        ? prev.filter(name => name !== addonName)
+        : [...prev, addonName]
+    );
   };
 
   return (
@@ -153,7 +169,7 @@ export default function ItemView() {
           <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>
             Size
           </ThemedText>
-          <ThemedView style={styles.sizeContainer}>
+          <View style={styles.sizeContainer}>
             {item.sizes.map((size) => (
               <TouchableOpacity
                 key={size.name}
@@ -211,8 +227,93 @@ export default function ItemView() {
                 </ThemedText>
               </TouchableOpacity>
             ))}
-          </ThemedView>
+          </View>
         </ThemedView>
+
+        {/* Addons Selection */}
+        {item.addOns && item.addOns.length > 0 && (
+          <ThemedView
+            style={[styles.sectionContainer, { backgroundColor: theme.card }]}
+          >
+            <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>
+              Add-ons
+            </ThemedText>
+            <View style={styles.addonsContainer}>
+              {item.addOns.map((addon) => (
+                <TouchableOpacity
+                  key={addon.name}
+                  style={[
+                    styles.addonOption,
+                    selectedAddons.includes(addon.name) && styles.selectedAddon,
+                    !addon.isAvailable && styles.disabledAddon,
+                    {
+                      borderColor: selectedAddons.includes(addon.name)
+                        ? theme.primary
+                        : !addon.isAvailable
+                        ? theme.muted
+                        : theme.border,
+                      backgroundColor: selectedAddons.includes(addon.name)
+                        ? theme.primary + "20"
+                        : !addon.isAvailable
+                        ? theme.muted + "20"
+                        : "transparent",
+                    },
+                  ]}
+                  onPress={() => addon.isAvailable && handleToggleAddon(addon.name)}
+                  disabled={!addon.isAvailable}
+                >
+                  <View style={styles.addonContent}>
+                    <ThemedText
+                      style={[
+                        styles.addonName,
+                        {
+                          color: selectedAddons.includes(addon.name)
+                            ? theme.primary
+                            : !addon.isAvailable
+                            ? theme.muted
+                            : theme.text,
+                        },
+                      ]}
+                    >
+                      {addon.name}
+                    </ThemedText>
+                    <ThemedText
+                      style={[
+                        styles.addonPrice,
+                        {
+                          color: selectedAddons.includes(addon.name)
+                            ? theme.primary
+                            : !addon.isAvailable
+                            ? theme.muted
+                            : theme.muted,
+                        },
+                      ]}
+                    >
+                      +₱{addon.price}
+                    </ThemedText>
+                  </View>
+                  <View
+                    style={[
+                      styles.checkbox,
+                      {
+                        borderColor: selectedAddons.includes(addon.name)
+                          ? theme.primary
+                          : theme.border,
+                        backgroundColor: selectedAddons.includes(addon.name)
+                          ? theme.primary
+                          : "transparent",
+                      },
+                    ]}
+                  >
+                    {selectedAddons.includes(addon.name) && (
+                      <Ionicons name="checkmark" size={16} color={theme.background} />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ThemedView>
+        )}
 
         {/* Quantity Selection */}
         <ThemedView
@@ -383,6 +484,44 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "800",
     letterSpacing: 3,
+  },
+  addonsContainer: {
+    gap: 12,
+  },
+  addonOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+  },
+  selectedAddon: {
+    // backgroundColor handled in style prop
+  },
+  disabledAddon: {
+    opacity: 0.6,
+  },
+  addonContent: {
+    flex: 1,
+  },
+  addonName: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  addonPrice: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
   },
   quantityContainer: {
     flexDirection: "row",

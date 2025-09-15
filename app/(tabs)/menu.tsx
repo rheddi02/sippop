@@ -104,9 +104,12 @@ export default function MenuScreen() {
           />
 
       {/* Checkout Button */}
-      <TouchableOpacity style={styles.checkoutButton}>
+      {/* <TouchableOpacity style={styles.checkoutButton}>
         <ThemedText style={styles.checkoutButtonText}>Checkout order</ThemedText>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <ThemedView style={[styles.checkoutButton, { backgroundColor: theme.muted }]}>
+        <ThemedText style={styles.checkoutButtonText}>Checkout order</ThemedText>
+      </ThemedView>
     </ThemedView>
   );
 }
@@ -152,10 +155,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingBottom: 100, // Space for checkout button
     width: '100%',
+    alignItems: 'flex-start',
   },
   row: {
     justifyContent: 'space-around',
-    marginBottom: 8,
+    marginBottom: -10,
   },
   checkoutButton: {
     position: 'absolute',
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
     right: 20,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FF6B35',
+    // backgroundColor: '#FF6B35',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

@@ -35,7 +35,7 @@ export default function MenuItem({
   // Calculate exact width for 2-column layout
   const screenWidth = Dimensions.get('window').width;
   const flatListPadding = 16; // 8px left + 8px right from gridContainer
-  const itemMargin = 16; // 8px margin on each side
+  const itemMargin = 16; // 8px margin on each side (4px + 4px from marginHorizontal)
   const itemWidth = (screenWidth - flatListPadding - itemMargin) / 2;
 
   const handleAddToCart = () => {
@@ -86,7 +86,7 @@ export default function MenuItem({
           {typeof image === 'string' ? (
             <ThemedText style={styles.image}>{image}</ThemedText>
           ) : (
-            <Image source={image} style={styles.image} resizeMode="contain" />
+            <Image source={image} style={styles.image} resizeMode="cover" />
           )}
         </View>
 
@@ -110,7 +110,7 @@ export default function MenuItem({
             </ThemedText>
 
             {/* Add to Cart Button */}
-            <TouchableOpacity 
+            {/* <TouchableOpacity 
               style={[
                 styles.addButton,
                 { backgroundColor: inCart ? theme.primary : theme.card }
@@ -125,7 +125,7 @@ export default function MenuItem({
               >
                 +
               </ThemedText>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </ThemedCard>
@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     justifyContent: 'space-between',
+    marginHorizontal: 4,
   },
   contentContainer: {
     flex: 1,
@@ -182,11 +183,13 @@ const styles = StyleSheet.create({
     height: 160,
     justifyContent: 'center',
     marginBottom: 8,
+    overflow: 'hidden',
   },
   image: {
-    width: "100%",
-    height: 140,
+    width: 240,
+    height: 240,
     marginVertical: 8,
+    borderRadius: 8,
   },
   name: {
     marginBottom: 4,
@@ -207,8 +210,8 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   addButton: {
-    width: 32,
-    height: 32,
+    width: 45,
+    height: 24,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',

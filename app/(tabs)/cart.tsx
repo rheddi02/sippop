@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { Button, FlatList, StyleSheet, View } from "react-native";
+import { Button, FlatList, View } from "react-native";
 import { useCart } from "../../context/CartContext";
 import { useOrders } from "../../context/OrdersContext";
 
@@ -10,7 +10,10 @@ export default function CartScreen() {
 
   const handleCheckout = () => {
     if (cart.length === 0) return;
-    placeOrder(cart, cart.reduce((acc, item) => acc + item.price * item.quantity, 0));
+    placeOrder(
+      cart,
+      cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    );
     clearCart();
   };
 
@@ -19,7 +22,10 @@ export default function CartScreen() {
       <FlatList
         data={cart}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={<ThemedText>Your cart is empty.</ThemedText>}
+        ListEmptyComponent={
+          
+            <ThemedText>Your cart is empty.</ThemedText>
+        }
         renderItem={({ item }) => (
           <ThemedView
             style={{
@@ -35,25 +41,27 @@ export default function CartScreen() {
               {item.name} x {item.quantity} = ₱{item.price * item.quantity}
             </ThemedText>
             <View style={{ flexDirection: "row", gap: 4 }}>
-              <Button title="-" onPress={() => updateQuantity(item.id, item.quantity - 1)} />
-              <Button title="+" onPress={() => updateQuantity(item.id, item.quantity + 1)} />
+              <Button
+                title="-"
+                onPress={() => updateQuantity(item.id, item.quantity - 1)}
+              />
+              <Button
+                title="+"
+                onPress={() => updateQuantity(item.id, item.quantity + 1)}
+              />
               <Button title="Remove" onPress={() => removeFromCart(item.id)} />
             </View>
           </ThemedView>
         )}
       />
 
-      {cart.length > 0 && (
+      {/* {cart.length > 0 && (
         <ThemedView style={{ marginTop: 20 }}>
           <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>
             Total: ₱{cart.reduce((acc, item) => acc + item.price * item.quantity, 0)}
           </ThemedText>
         </ThemedView>
-      )}
+      )} */}
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  
-});
