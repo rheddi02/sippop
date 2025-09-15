@@ -1,6 +1,6 @@
+import { useThemeColors } from "@/context";
 import React from "react";
-import { Text, StyleSheet, TextProps } from "react-native";
-import { useThemeColors } from "../theme/ThemeContext";
+import { StyleSheet, Text, TextProps } from "react-native";
 
 type Variant = "title" | "subtitle" | "body" | "caption";
 

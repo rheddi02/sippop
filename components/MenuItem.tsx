@@ -1,7 +1,10 @@
+import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useCart } from '../context/CartContext';
 import { useThemeColors } from '../context/ThemeContext';
+import { ThemedCard } from './ThemedCard';
+import { ThemedText } from './ThemedText';
 
 interface MenuItemProps {
   id: string;
@@ -11,6 +14,7 @@ interface MenuItemProps {
   image: string;
   isFavorite?: boolean;
   inCart?: boolean;
+  sizes?: { name: string; price: number; multiplier: number; isAvailable: boolean }[];
   onToggleFavorite?: (id: string) => void;
 }
 
@@ -22,10 +26,17 @@ export default function MenuItem({
   image,
   isFavorite = false,
   inCart = false,
+  sizes,
   onToggleFavorite,
 }: MenuItemProps) {
   const { theme } = useThemeColors();
   const { addToCart } = useCart();
+  
+  // Calculate exact width for 2-column layout
+  const screenWidth = Dimensions.get('window').width;
+  const flatListPadding = 16; // 8px left + 8px right from gridContainer
+  const itemMargin = 16; // 8px margin on each side
+  const itemWidth = (screenWidth - flatListPadding - itemMargin) / 2;
 
   const handleAddToCart = () => {
     addToCart({ id, name, price, points: 1 });
@@ -37,76 +48,93 @@ export default function MenuItem({
     }
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.card }]}>
-      {/* Favorite Heart Icon */}
-      <TouchableOpacity 
-        style={styles.favoriteButton} 
-        onPress={handleToggleFavorite}
-      >
-        <Text style={[
-          styles.favoriteIcon,
-          { color: isFavorite ? theme.primary : theme.muted }
-        ]}>
-          ♥
-        </Text>
-      </TouchableOpacity>
+  const handleItemPress = () => {
+    router.push(`/item/${id}`);
+  };
 
-      {/* Pizza Image */}
-      <View style={styles.imageContainer}>
-        <Text style={styles.image}>{image}</Text>
+  return (
+    <TouchableOpacity onPress={handleItemPress} activeOpacity={0.8}>
+      <ThemedCard variant="elevated" style={[styles.container, { width: itemWidth }]}>
+      {/* Favorite Heart Icon */}
+      <View style={styles.favoriteButton}>
+        <TouchableOpacity 
+          onPress={handleToggleFavorite}
+          style={styles.favoriteIconContainer}
+        >
+          <ThemedText 
+            style={[
+              styles.favoriteIcon,
+              { color: isFavorite ? theme.primary : theme.muted }
+            ]}
+          >
+            ♥
+          </ThemedText>
+        </TouchableOpacity>
       </View>
 
-      {/* Pizza Name */}
-      <Text style={[styles.name, { color: theme.text }]}>{name}</Text>
+      {/* Beverage Image */}
+      <View style={styles.imageContainer}>
+        {typeof image === 'string' ? (
+          <ThemedText style={styles.image}>{image}</ThemedText>
+        ) : (
+          <Image source={image} style={styles.image} resizeMode="contain" />
+        )}
+      </View>
 
-      {/* Price */}
-      <Text style={[styles.price, { color: theme.text }]}>€ {price}</Text>
+      {/* Beverage Name */}
+      <ThemedText type="subtitle" style={styles.name}>{name}</ThemedText>
+      
+      <View style={styles.priceRow}>
+        {/* Price */}
+        <ThemedText type="price" style={styles.price}>
+          ₱ {sizes && sizes.filter(size=>size.isAvailable).length > 0 ? sizes.filter(size=>size.isAvailable)[0].price : price}
+        </ThemedText>
+
+        {/* Add to Cart Button */}
+        <TouchableOpacity 
+          style={[
+            styles.addButton,
+            { backgroundColor: inCart ? theme.primary : theme.card }
+          ]}
+          onPress={handleAddToCart}
+        >
+          <ThemedText 
+            style={[
+              styles.addButtonText,
+              { color: inCart ? theme.background : theme.text }
+            ]}
+          >
+            +
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
 
       {/* Description */}
-      <Text style={[styles.description, { color: theme.muted }]}>{description}</Text>
-
-      {/* Add to Cart Button */}
-      <TouchableOpacity 
-        style={[
-          styles.addButton,
-          { backgroundColor: inCart ? theme.primary : theme.card }
-        ]}
-        onPress={handleAddToCart}
-      >
-        <Text style={[
-          styles.addButtonText,
-          { color: inCart ? theme.background : theme.text }
-        ]}>
-          +
-        </Text>
-      </TouchableOpacity>
-    </View>
+      <ThemedText type="caption" style={styles.description}>{description}</ThemedText>
+      </ThemedCard>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
-    padding: 16,
-    margin: 8,
-    width: 160,
-    height: 220,
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 8,
   },
   favoriteButton: {
     position: 'absolute',
     top: 12,
     left: 12,
     zIndex: 1,
+    width: 24,
+    height: 24,
+  },
+  favoriteIconContainer: {
     width: 24,
     height: 24,
     alignItems: 'center',
@@ -117,34 +145,32 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 12,
+    height: 220,
+    justifyContent: 'center',
+    marginBottom: 10
   },
   image: {
-    fontSize: 60,
+    width: "100%",
+    height: 200,
+    marginVertical: 12,
   },
   name: {
-    fontSize: 18,
-    fontWeight: '600',
     marginBottom: 4,
-    textAlign: 'center',
+    // textAlign: 'center',
   },
   price: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 8,
-    textAlign: 'center',
+    flex: 1,
+    textAlign: 'left',
   },
   description: {
     fontSize: 12,
     lineHeight: 16,
     textAlign: 'center',
-    marginBottom: 16,
+    marginTop: 8,
+    marginBottom: 8,
     flex: 1,
   },
   addButton: {
-    position: 'absolute',
-    bottom: 12,
     right: 12,
     width: 32,
     height: 32,

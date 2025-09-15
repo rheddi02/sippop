@@ -1,32 +1,34 @@
 import { useThemeColors } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const { theme } = useThemeColors();
 
   return (
-    <Tabs 
-      screenOptions={{ 
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: theme.background,
-          borderTopColor: theme.border,
-          height: 80,
-        },
-        tabBarActiveTintColor: theme.primary,
-        tabBarInactiveTintColor: theme.text,
-        tabBarItemStyle: {
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingTop: 14,
-          paddingBottom: 8,
-        },
-        tabBarLabelStyle: {
-          textAlign: 'center',
-        },
-      }}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <Tabs 
+        screenOptions={{ 
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: theme.background,
+            borderTopColor: theme.border,
+            height: 80,
+          },
+          tabBarActiveTintColor: theme.primary,
+          tabBarInactiveTintColor: theme.text,
+          tabBarItemStyle: {
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: 14,
+            paddingBottom: 8,
+          },
+          tabBarLabelStyle: {
+            textAlign: 'center',
+          },
+        }}
+      >
       <Tabs.Screen 
         name="menu" 
         options={{ 
@@ -73,6 +75,7 @@ export default function TabLayout() {
           ),
         }} 
       />
-    </Tabs>
+      </Tabs>
+    </SafeAreaView>
   );
 }

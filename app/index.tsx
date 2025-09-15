@@ -1,5 +1,7 @@
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet } from "react-native";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen() {
@@ -12,10 +14,10 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Milktea Store</Text>
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title}>Milktea Store</ThemedText>
       <Button title="Login" onPress={handleLogin} />
-    </View>
+    </ThemedView>
   );
 }
 

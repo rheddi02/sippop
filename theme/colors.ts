@@ -8,6 +8,7 @@ export const lightColors = {
   accent: "#FFB366", // light orange
   muted: "#999999", // muted text
   tint: "#FF6B35", // tint color for light theme
+  danger: "#FF000000"
 };
 
 export const darkColors = {
@@ -20,4 +21,5 @@ export const darkColors = {
   accent: "#FFB366", // light orange
   muted: "#666666", // muted text
   tint: "#FFFFFF", // tint color for dark theme
+  danger: "#FF000000"
 };

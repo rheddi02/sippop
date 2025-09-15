@@ -1,13 +1,12 @@
 import { useThemeColors } from "@/context/ThemeContext";
-import { WalletContext } from "@/context/WalletContext";
-import { useContext } from "react";
+import { useWallet } from "@/context/WalletContext";
 import { View } from "react-native";
 import Card from "../../components/Card";
-import PrimaryButton from "../../components/PrimaryButton";
+import PrimaryButton from "../../components/ThemedButton";
 import Typography from "../../components/Typography";
 
 export default function WalletScreen() {
-  const { balance, addFunds, deduct } = useContext(WalletContext);
+  const { balance, addFunds, deduct } = useWallet();
   const { theme } = useThemeColors();
 
   return (

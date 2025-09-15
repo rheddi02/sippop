@@ -1,6 +1,6 @@
+import { useThemeColors } from "@/context";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { useThemeColors } from "../theme/ThemeContext";
 
 export default function Card({ children }: { children: React.ReactNode }) {
   const { theme } = useThemeColors();

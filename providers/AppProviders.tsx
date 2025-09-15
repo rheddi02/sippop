@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { FavoritesProvider } from "@/context/FavoritesContext";
 import { OrdersProvider } from "@/context/OrdersContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { WalletProvider } from "@/context/WalletContext";
@@ -13,7 +14,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
         <AuthProvider>
           <WalletProvider>
             <CartProvider>
-              <OrdersProvider>{children}</OrdersProvider>
+              <OrdersProvider>
+                <FavoritesProvider>{children}</FavoritesProvider>
+              </OrdersProvider>
             </CartProvider>
           </WalletProvider>
         </AuthProvider>

@@ -1,16 +1,17 @@
-import { useContext } from "react";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { FlatList, Text, View } from "react-native";
-import { OrdersContext } from "../../context/OrdersContext";
+import { useOrders } from "../../context/OrdersContext";
 
 export default function OrdersScreen() {
-  const { orders } = useContext(OrdersContext);
+  const { orders } = useOrders();
 
   return (
-    <View style={{ flex: 1, padding: 16 }}>
+    <ThemedView style={{ flex: 1, padding: 16 }}>
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Text>No orders yet.</Text>}
+        ListEmptyComponent={<ThemedText>No orders yet.</ThemedText>}
         renderItem={({ item }) => (
           <View
             style={{
@@ -26,6 +27,6 @@ export default function OrdersScreen() {
           </View>
         )}
       />
-    </View>
+    </ThemedView>
   );
 }

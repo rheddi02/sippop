@@ -1,5 +1,7 @@
+import { ThemedButton } from "@/components/ThemedButton";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
-import { Button, Text, View } from "react-native";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ProfileScreen() {
@@ -12,9 +14,9 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 18 }}>Hello, {user?.name}</Text>
-      <Button title="Logout" onPress={handleLogout} />
-    </View>
+    <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ThemedText style={{ fontSize: 18 }}>Hello, {user?.name}</ThemedText>
+      <ThemedButton title="Logout" onPress={handleLogout} style={{ borderRadius: 50, width: '80%'}} />
+    </ThemedView>
   );
 }
