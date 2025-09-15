@@ -9,11 +9,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
+    Animated,
+    Dimensions,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -79,12 +79,18 @@ export default function ItemView() {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleToggleFavorite}
-          style={styles.favoriteButton}
+          style={[
+            styles.favoriteButton,
+            {
+              backgroundColor: isFavorite(item.id) ? theme.primary : theme.background,
+              borderColor: isFavorite(item.id) ? theme.primary : theme.border,
+            }
+          ]}
         >
           <Ionicons
             name={isFavorite(item.id) ? "heart" : "heart-outline"}
             size={24}
-            color={isFavorite(item.id) ? theme.primary : theme.text}
+            color={isFavorite(item.id) ? theme.background : theme.muted}
           />
         </TouchableOpacity>
       </ThemedView>
@@ -293,6 +299,16 @@ const styles = StyleSheet.create({
   },
   favoriteButton: {
     padding: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   scrollView: {
     flex: 1,

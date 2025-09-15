@@ -2,7 +2,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import React, { useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, TouchableOpacity } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { mockMenu } from "../../api/mockData";
 import MenuItem from "../../components/MenuItem";
 import { useFavorites } from "../../context/FavoritesContext";
@@ -11,7 +10,6 @@ import { useThemeColors } from "../../context/ThemeContext";
 export default function MenuScreen() {
   const { theme } = useThemeColors();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
-  const insets = useSafeAreaInsets();
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [refreshing, setRefreshing] = useState(false);
 
@@ -92,6 +90,7 @@ export default function MenuScreen() {
             renderItem={renderMenuItem}
             numColumns={2}
             contentContainerStyle={styles.gridContainer}
+            columnWrapperStyle={styles.row}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -153,6 +152,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingBottom: 100, // Space for checkout button
     width: '100%',
+  },
+  row: {
+    justifyContent: 'space-around',
+    marginBottom: 8,
   },
   checkoutButton: {
     position: 'absolute',

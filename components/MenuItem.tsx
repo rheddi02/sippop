@@ -54,63 +54,80 @@ export default function MenuItem({
 
   return (
     <TouchableOpacity onPress={handleItemPress} activeOpacity={0.8}>
-      <ThemedCard variant="elevated" style={[styles.container, { width: itemWidth }]}>
-      {/* Favorite Heart Icon */}
-      <View style={styles.favoriteButton}>
-        <TouchableOpacity 
-          onPress={handleToggleFavorite}
-          style={styles.favoriteIconContainer}
-        >
-          <ThemedText 
+      <ThemedCard variant="elevated" style={[styles.container, { width: itemWidth, height: 320 }]}>
+        {/* Favorite Heart Icon */}
+        <View style={styles.favoriteButton}>
+          <TouchableOpacity 
+            onPress={handleToggleFavorite}
             style={[
-              styles.favoriteIcon,
-              { color: isFavorite ? theme.primary : theme.muted }
+              styles.favoriteIconContainer,
+              { 
+                backgroundColor: isFavorite ? theme.primary : theme.background,
+                borderColor: isFavorite ? theme.primary : theme.border
+              }
             ]}
           >
-            ♥
+            <ThemedText 
+              style={[
+                styles.favoriteIcon,
+                { 
+                  color: isFavorite ? theme.background : theme.muted,
+                  fontSize: isFavorite ? 18 : 16
+                }
+              ]}
+            >
+              {isFavorite ? '♥' : '♡'}
+            </ThemedText>
+          </TouchableOpacity>
+        </View>
+
+        {/* Beverage Image */}
+        <View style={styles.imageContainer}>
+          {typeof image === 'string' ? (
+            <ThemedText style={styles.image}>{image}</ThemedText>
+          ) : (
+            <Image source={image} style={styles.image} resizeMode="contain" />
+          )}
+        </View>
+
+        {/* Content Container with Fixed Height */}
+        <View style={styles.contentContainer}>
+          {/* Beverage Name */}
+          <ThemedText type="subtitle" style={styles.name} numberOfLines={2} ellipsizeMode="tail">
+            {name}
           </ThemedText>
-        </TouchableOpacity>
-      </View>
-
-      {/* Beverage Image */}
-      <View style={styles.imageContainer}>
-        {typeof image === 'string' ? (
-          <ThemedText style={styles.image}>{image}</ThemedText>
-        ) : (
-          <Image source={image} style={styles.image} resizeMode="contain" />
-        )}
-      </View>
-
-      {/* Beverage Name */}
-      <ThemedText type="subtitle" style={styles.name}>{name}</ThemedText>
-      
-      <View style={styles.priceRow}>
-        {/* Price */}
-        <ThemedText type="price" style={styles.price}>
-          ₱ {sizes && sizes.filter(size=>size.isAvailable).length > 0 ? sizes.filter(size=>size.isAvailable)[0].price : price}
-        </ThemedText>
-
-        {/* Add to Cart Button */}
-        <TouchableOpacity 
-          style={[
-            styles.addButton,
-            { backgroundColor: inCart ? theme.primary : theme.card }
-          ]}
-          onPress={handleAddToCart}
-        >
-          <ThemedText 
-            style={[
-              styles.addButtonText,
-              { color: inCart ? theme.background : theme.text }
-            ]}
-          >
-            +
+          
+          {/* Description */}
+          <ThemedText type="caption" style={styles.description} numberOfLines={2} ellipsizeMode="tail">
+            {description}
           </ThemedText>
-        </TouchableOpacity>
-      </View>
+          
+          {/* Price Row */}
+          <View style={styles.priceRow}>
+            {/* Price */}
+            <ThemedText type="price" style={styles.price}>
+              ₱ {sizes && sizes.filter(size=>size.isAvailable).length > 0 ? sizes.filter(size=>size.isAvailable)[0].price : price}
+            </ThemedText>
 
-      {/* Description */}
-      <ThemedText type="caption" style={styles.description}>{description}</ThemedText>
+            {/* Add to Cart Button */}
+            <TouchableOpacity 
+              style={[
+                styles.addButton,
+                { backgroundColor: inCart ? theme.primary : theme.card }
+              ]}
+              onPress={handleAddToCart}
+            >
+              <ThemedText 
+                style={[
+                  styles.addButtonText,
+                  { color: inCart ? theme.background : theme.text }
+                ]}
+              >
+                +
+              </ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ThemedCard>
     </TouchableOpacity>
   );
@@ -119,59 +136,77 @@ export default function MenuItem({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+    justifyContent: 'space-between',
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingTop: 8,
   },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    marginTop: 8,
   },
   favoriteButton: {
     position: 'absolute',
     top: 12,
     left: 12,
     zIndex: 1,
-    width: 24,
-    height: 24,
+    width: 32,
+    height: 32,
   },
   favoriteIconContainer: {
-    width: 24,
-    height: 24,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   favoriteIcon: {
     fontSize: 16,
+    fontWeight: 'bold',
   },
   imageContainer: {
     alignItems: 'center',
-    height: 220,
+    height: 160,
     justifyContent: 'center',
-    marginBottom: 10
+    marginBottom: 8,
   },
   image: {
     width: "100%",
-    height: 200,
-    marginVertical: 12,
+    height: 140,
+    marginVertical: 8,
   },
   name: {
     marginBottom: 4,
-    // textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   price: {
     flex: 1,
     textAlign: 'left',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   description: {
     fontSize: 12,
     lineHeight: 16,
-    textAlign: 'center',
-    marginTop: 8,
     marginBottom: 8,
-    flex: 1,
+    color: '#666',
   },
   addButton: {
-    right: 12,
     width: 32,
     height: 32,
     borderRadius: 16,
