@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     paddingRight: 20,
   },
   tab: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 10,
     marginRight: 12,
     alignItems: 'center',

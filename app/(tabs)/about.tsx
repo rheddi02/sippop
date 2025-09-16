@@ -1,3 +1,4 @@
+import { ExternalLink } from "@/components/external-link";
 import { Spacer } from "@/components/Spacer";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -18,8 +19,9 @@ export default function ProfileScreen() {
   return (
     <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
       <ThemedText type="title" bold>A&Y Sippop</ThemedText>
-      <Spacer style={{ marginVertical: 40 }} />
-      <ThemedText type='subtitle'>📍 Store Address</ThemedText>
+      <Spacer style={{ marginVertical: 20 }} />
+      <ThemedText type='subtitle'>📍</ThemedText>
+      <ThemedText type='subtitle'>Store Address</ThemedText>
       <Spacer style={{ marginVertical: 10 }} />
       <ThemedText>
         Rizal St. Bgy. Basud
@@ -27,20 +29,33 @@ export default function ProfileScreen() {
       <ThemedText>
         Nearby of Sto Niño, High school.
       </ThemedText>
-      <Spacer style={{ marginVertical: 40 }} />
-      <ThemedText type='subtitle'>⏰ Store Hours</ThemedText>
-      <Spacer style={{ marginVertical: 10 }} />
+      <Spacer style={{ marginVertical: 20 }} />
+      <ThemedText type='subtitle'>⏰</ThemedText>
+      <ThemedText type='subtitle'>Store Hours</ThemedText>
+      <Spacer style={{ marginVertical: 5 }} />
       <ThemedText>
         Open EVERYDAY from 8am to 6pm.
       </ThemedText>
-      <Spacer style={{ marginVertical: 40 }} />
-      <ThemedText type='subtitle'>📞 Contact Details</ThemedText>
-      <Spacer style={{ marginVertical: 10 }} />
+      <Spacer style={{ marginVertical: 20 }} />
+      <ThemedText type='subtitle'>📞</ThemedText>
+      <ThemedText type='subtitle'>Contact Details</ThemedText>
+      <Spacer style={{ marginVertical: 5 }} />
+      {/* <ThemedText>
+        Yhenna Mae AB
+      </ThemedText> */}
+      {/* <Spacer style={{ marginVertical: 5 }} /> */}
       <ThemedText>
-        Yhenna Mae A. Bayog
+        Fb Page:
       </ThemedText>
       <ThemedText>
-        WhatsApp: +63 935 811 4619
+        <ExternalLink href="https://web.facebook.com/AYSIPPOP">https://web.facebook.com/AYSIPPOP</ExternalLink>
+      </ThemedText>
+      <Spacer style={{ marginVertical: 5 }} />
+      <ThemedText>
+        WhatsApp:
+      </ThemedText>
+      <ThemedText>
+        <ExternalLink href="https://wa.me/639358114619">+63 935 811 4619</ExternalLink>
       </ThemedText>
     </ThemedView>
   )

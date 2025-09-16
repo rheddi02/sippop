@@ -1,5 +1,5 @@
-import React, { createContext, useState, ReactNode, useContext } from "react";
 import { User } from "@/utils/types";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface AuthContextType {
   user: User | null;
@@ -10,7 +10,14 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  // Skip login for now - automatically set a logged-in user
+  const [user, setUser] = useState<User | null>({
+    id: "u1",
+    name: "John Doe",
+    email: "john@example.com",
+    points: 5,
+    walletBalance: 200,
+  });
 
   const login = (email: string, password: string) => {
     // mock login
