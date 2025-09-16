@@ -51,6 +51,23 @@
       "alias": {
         "@": "."
       }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9f14f340-b383-4ac1-ae83-ffabd570b54b"
+      }
+    },
+    "expo": {
+      "updates": {
+        "url": "https://u.expo.dev/9f14f340-b383-4ac1-ae83-ffabd570b54b"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9f14f340-b383-4ac1-ae83-ffabd570b54b"
     }
   }
 }
