@@ -6,6 +6,7 @@ import { mockMenu } from "../../api/mockData";
 import MenuItem from "../../components/MenuItem";
 import { useFavorites } from "../../context/FavoritesContext";
 import { useThemeColors } from "../../context/ThemeContext";
+import WalletScreen from "./wallet";
 
 export default function MenuScreen() {
   const { theme } = useThemeColors();
@@ -30,6 +31,7 @@ export default function MenuScreen() {
   const categories = [
     { id: "all", name: "All", count: mockMenu.length },
     { id: "soda", name: "Soda", count: mockMenu.filter(item => item.category === "soda").length },
+    { id: "milk", name: "Milk", count: mockMenu.filter(item => item.category === "milk").length },
     { id: "coffee", name: "Coffee", count: mockMenu.filter(item => item.category === "coffee").length },
     { id: "favorite", name: "Favorites", count: favorites.length },
   ];
@@ -50,6 +52,11 @@ export default function MenuScreen() {
 
   return (
     <ThemedView style={[styles.container]}>
+      {/* Wallet Section */}
+      <ThemedView style={styles.walletWrapper}>
+        <WalletScreen />
+      </ThemedView>
+
       {/* Category Tabs */}
       <ThemedView style={[styles.tabContainer]}>
         <FlatList
@@ -117,6 +124,10 @@ export default function MenuScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  walletWrapper: {
+    overflow: 'hidden',
+    marginBottom:10
   },
   tabContainer: {
     paddingHorizontal: 20,

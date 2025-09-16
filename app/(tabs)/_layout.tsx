@@ -30,6 +30,12 @@ export default function TabLayout() {
         }}
       >
       <Tabs.Screen 
+        name="wallet" 
+        options={{ 
+          href: null
+        }} 
+      />
+      <Tabs.Screen 
         name="menu" 
         options={{ 
           title: "Menu",
@@ -44,16 +50,6 @@ export default function TabLayout() {
           title: "Cart",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="cart" size={size} color={color} />
-          ),
-        }} 
-      />
-      <Tabs.Screen 
-        name="wallet" 
-        options={{ 
-          title: "Wallet", 
-          href: null,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="wallet" size={size} color={color} />
           ),
         }} 
       />

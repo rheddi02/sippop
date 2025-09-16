@@ -1,4 +1,5 @@
 import { mockMenu } from "@/api/mockData";
+import FavoriteButton from "@/components/FavoriteButton";
 import { ThemedCard } from "@/components/ThemedCard";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -40,7 +41,7 @@ export default function ItemView() {
   const parallaxFactor = 0.5;
 
   const basePrice = selectedSize.price;
-  
+
   // Calculate addon costs
   const addonCosts = selectedAddons.reduce((total, addonName) => {
     const addon = item.addOns?.find(addon => addon.name === addonName);
@@ -65,8 +66,8 @@ export default function ItemView() {
   };
 
   const handleToggleAddon = (addonName: string) => {
-    setSelectedAddons(prev => 
-      prev.includes(addonName) 
+    setSelectedAddons(prev =>
+      prev.includes(addonName)
         ? prev.filter(name => name !== addonName)
         : [...prev, addonName]
     );
@@ -93,22 +94,9 @@ export default function ItemView() {
         >
           <Ionicons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleToggleFavorite}
-          style={[
-            styles.favoriteButton,
-            {
-              backgroundColor: isFavorite(item.id) ? theme.primary : theme.background,
-              borderColor: isFavorite(item.id) ? theme.primary : theme.border,
-            }
-          ]}
-        >
-          <Ionicons
-            name={isFavorite(item.id) ? "heart" : "heart-outline"}
-            size={24}
-            color={isFavorite(item.id) ? theme.background : theme.muted}
-          />
-        </TouchableOpacity>
+        <FavoriteButton isFavorite={isFavorite(item.id)}
+          onToggle={handleToggleFavorite}
+          size="large" />
       </ThemedView>
 
       <ScrollView
@@ -182,14 +170,14 @@ export default function ItemView() {
                       selectedSize.name === size.name
                         ? theme.primary
                         : !size.isAvailable
-                        ? theme.muted
-                        : theme.border,
+                          ? theme.muted
+                          : theme.border,
                     backgroundColor:
                       selectedSize.name === size.name
                         ? theme.primary
                         : !size.isAvailable
-                        ? theme.muted + "20"
-                        : "transparent",
+                          ? theme.muted + "20"
+                          : "transparent",
                   },
                 ]}
                 onPress={() => size.isAvailable && setSelectedSize(size)}
@@ -203,8 +191,8 @@ export default function ItemView() {
                         selectedSize.name === size.name
                           ? theme.background
                           : !size.isAvailable
-                          ? theme.muted
-                          : theme.text,
+                            ? theme.muted
+                            : theme.text,
                     },
                   ]}
                 >
@@ -218,8 +206,8 @@ export default function ItemView() {
                         selectedSize.name === size.name
                           ? theme.background
                           : !size.isAvailable
-                          ? theme.muted
-                          : theme.muted,
+                            ? theme.muted
+                            : theme.muted,
                     },
                   ]}
                 >
@@ -250,13 +238,13 @@ export default function ItemView() {
                       borderColor: selectedAddons.includes(addon.name)
                         ? theme.primary
                         : !addon.isAvailable
-                        ? theme.muted
-                        : theme.border,
+                          ? theme.muted
+                          : theme.border,
                       backgroundColor: selectedAddons.includes(addon.name)
                         ? theme.primary + "20"
                         : !addon.isAvailable
-                        ? theme.muted + "20"
-                        : "transparent",
+                          ? theme.muted + "20"
+                          : "transparent",
                     },
                   ]}
                   onPress={() => addon.isAvailable && handleToggleAddon(addon.name)}
@@ -270,8 +258,8 @@ export default function ItemView() {
                           color: selectedAddons.includes(addon.name)
                             ? theme.primary
                             : !addon.isAvailable
-                            ? theme.muted
-                            : theme.text,
+                              ? theme.muted
+                              : theme.text,
                         },
                       ]}
                     >
@@ -284,8 +272,8 @@ export default function ItemView() {
                           color: selectedAddons.includes(addon.name)
                             ? theme.primary
                             : !addon.isAvailable
-                            ? theme.muted
-                            : theme.muted,
+                              ? theme.muted
+                              : theme.muted,
                         },
                       ]}
                     >

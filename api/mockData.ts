@@ -19,7 +19,7 @@ export const mockMenu = [
     ],
   },
   { 
-    id: "9", 
+    id: "2", 
     name: "Blueberry Soda Cooler", 
     price: 39, 
     points: 1,

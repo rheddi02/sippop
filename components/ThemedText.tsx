@@ -4,12 +4,14 @@ import { useThemeColors } from '../context/ThemeContext';
 
 interface ThemedTextProps extends TextProps {
   type?: 'title' | 'subtitle' | 'body' | 'caption' | 'price' | 'label';
+  bold?: boolean;
   children: React.ReactNode;
 }
 
 export function ThemedText({ 
   type = 'body', 
   style, 
+  bold = false,
   children, 
   ...props 
 }: ThemedTextProps) {
@@ -18,7 +20,7 @@ export function ThemedText({
   const getTextStyle = () => {
     switch (type) {
       case 'title':
-        return [styles.title, { color: theme.text }];
+        return [styles.title, { color: theme.text, fontWeight: bold ? "700" : "400" }];
       case 'subtitle':
         return [styles.subtitle, { color: theme.text }];
       case 'body':

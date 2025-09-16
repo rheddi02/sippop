@@ -3,6 +3,8 @@ import React from 'react';
 import { Dimensions, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { useCart } from '../context/CartContext';
 import { useThemeColors } from '../context/ThemeContext';
+import { formatPesoForPrice } from '../utils/amountHelper';
+import FavoriteButton from './FavoriteButton';
 import { ThemedCard } from './ThemedCard';
 import { ThemedText } from './ThemedText';
 
@@ -57,28 +59,10 @@ export default function MenuItem({
       <ThemedCard variant="elevated" style={[styles.container, { width: itemWidth, height: 320 }]}>
         {/* Favorite Heart Icon */}
         <View style={styles.favoriteButton}>
-          <TouchableOpacity 
-            onPress={handleToggleFavorite}
-            style={[
-              styles.favoriteIconContainer,
-              { 
-                backgroundColor: isFavorite ? theme.primary : theme.background,
-                borderColor: isFavorite ? theme.primary : theme.border
-              }
-            ]}
-          >
-            <ThemedText 
-              style={[
-                styles.favoriteIcon,
-                { 
-                  color: isFavorite ? theme.background : theme.muted,
-                  fontSize: isFavorite ? 18 : 16
-                }
-              ]}
-            >
-              {isFavorite ? '♥' : '♡'}
-            </ThemedText>
-          </TouchableOpacity>
+          <FavoriteButton
+            isFavorite={isFavorite}
+            onToggle={handleToggleFavorite}
+          />
         </View>
 
         {/* Beverage Image */}
@@ -106,7 +90,7 @@ export default function MenuItem({
           <View style={styles.priceRow}>
             {/* Price */}
             <ThemedText type="price" style={styles.price}>
-              ₱ {sizes && sizes.filter(size=>size.isAvailable).length > 0 ? sizes.filter(size=>size.isAvailable)[0].price : price}
+              {formatPesoForPrice(sizes && sizes.filter(size=>size.isAvailable).length > 0 ? sizes.filter(size=>size.isAvailable)[0].price : price)}
             </ThemedText>
 
             {/* Add to Cart Button */}
@@ -155,28 +139,6 @@ const styles = StyleSheet.create({
     top: 12,
     left: 12,
     zIndex: 1,
-    width: 32,
-    height: 32,
-  },
-  favoriteIconContainer: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 16,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  favoriteIcon: {
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   imageContainer: {
     alignItems: 'center',

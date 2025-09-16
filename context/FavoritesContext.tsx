@@ -24,7 +24,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         if (savedFavorites) {
           const parsedFavorites = JSON.parse(savedFavorites);
           setFavorites(parsedFavorites);
-          console.log('📱 Loaded favorites from storage:', parsedFavorites);
         }
       } catch (error) {
         console.error('Error loading favorites:', error);
@@ -46,7 +45,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     // Save to AsyncStorage
     try {
       await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(newFavorites));
-      console.log('💾 Saved favorites to storage:', newFavorites);
     } catch (error) {
       console.error('Error saving favorites:', error);
     }
@@ -58,7 +56,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     setFavorites([]);
     try {
       await AsyncStorage.removeItem(FAVORITES_STORAGE_KEY);
-      console.log('🗑️ Cleared all favorites from storage');
     } catch (error) {
       console.error('Error clearing favorites:', error);
     }
