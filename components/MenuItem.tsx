@@ -148,8 +148,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   image: {
-    width: 240,
-    height: 240,
+    width: '100%',
+    height: '100%',
     marginVertical: 8,
     borderRadius: 8,
   },

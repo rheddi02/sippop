@@ -10,8 +10,8 @@ export const mockMenu = [
     category: "soda",
     inCart: true,
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: true },
-      { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
+      { name: "12oz", price: 29, multiplier: 1, isAvailable: true },
+      { name: "16oz", price: 39, multiplier: 1.25, isAvailable: true }
     ],
     addOns: [
       { name: "Rainbow Jelly", price: 10, isAvailable: true },
@@ -29,8 +29,8 @@ export const mockMenu = [
     category: "soda",
     inCart: true,
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: true },
-      { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
+      { name: "12oz", price: 29, multiplier: 1, isAvailable: true },
+      { name: "16oz", price: 39, multiplier: 1.25, isAvailable: true }
     ],
     addOns: [
       { name: "Rainbow Jelly", price: 10, isAvailable: true },
@@ -48,8 +48,8 @@ export const mockMenu = [
     category: "soda",
     inCart: true,
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: true },
-      { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
+      { name: "12oz", price: 29, multiplier: 1, isAvailable: true },
+      { name: "16oz", price: 39, multiplier: 1.25, isAvailable: true }
     ],
     addOns: [
       { name: "Rainbow Jelly", price: 10, isAvailable: true },
@@ -67,8 +67,8 @@ export const mockMenu = [
     category: "soda",
     inCart: true,
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: true },
-      { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
+      { name: "12oz", price: 29, multiplier: 1, isAvailable: true },
+      { name: "16oz", price: 39, multiplier: 1.25, isAvailable: true }
     ],
     addOns: [
       { name: "Rainbow Jelly", price: 10, isAvailable: true },
@@ -85,8 +85,8 @@ export const mockMenu = [
     isFavorite: false,
     category: "soda",
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: true },
-      { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
+      { name: "12oz", price: 29, multiplier: 1, isAvailable: true },
+      { name: "16oz", price: 39, multiplier: 1.25, isAvailable: true }
     ],
     addOns: [
       { name: "Rainbow Jelly", price: 10, isAvailable: true },
@@ -176,7 +176,7 @@ export const mockMenu = [
     isFavorite: true,
     category: "coffee",
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: false },
+      // { name: "12oz", price: 39, multiplier: 1, isAvailable: false },
       { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
     ],
   },
@@ -190,7 +190,7 @@ export const mockMenu = [
     isFavorite: false,
     category: "coffee",
     sizes: [
-      { name: "12oz", price: 39, multiplier: 1, isAvailable: false },
+      // { name: "12oz", price: 39, multiplier: 1, isAvailable: false },
       { name: "16oz", price: 49, multiplier: 1.25, isAvailable: true }
     ],
   },

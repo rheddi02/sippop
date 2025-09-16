@@ -18,8 +18,7 @@ export default function CartScreen() {
 
   return (
     <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>CART</ThemedText>
-      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>TBA</ThemedText>
+      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>This page is under development.</ThemedText>
     </ThemedView>
   )
   // return (

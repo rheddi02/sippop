@@ -7,9 +7,8 @@ export default function OrdersScreen() {
 
   return (
     <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>ORDERS</ThemedText>
-      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>TBA</ThemedText>
-    </ThemedView>
+      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>This page is under development.</ThemedText>
+      </ThemedView>
   )
   // return (
   //   <ThemedView style={{ flex: 1, padding: 16 }}>

@@ -51,14 +51,14 @@ export default function ItemView() {
   const totalPrice = (basePrice + addonCosts) * quantity;
 
   const handleAddToCart = () => {
-    const addonNames = selectedAddons.length > 0 ? ` + ${selectedAddons.join(', ')}` : '';
-    addToCart({
-      id: `${item.id}-${selectedSize.name}${selectedAddons.length > 0 ? `-${selectedAddons.join('-')}` : ''}`,
-      name: `${item.name} (${selectedSize.name})${addonNames}`,
-      price: totalPrice,
-      points: item.points,
-    });
-    router.back();
+    // const addonNames = selectedAddons.length > 0 ? ` + ${selectedAddons.join(', ')}` : '';
+    // addToCart({
+    //   id: `${item.id}-${selectedSize.name}${selectedAddons.length > 0 ? `-${selectedAddons.join('-')}` : ''}`,
+    //   name: `${item.name} (${selectedSize.name})${addonNames}`,
+    //   price: totalPrice,
+    //   points: item.points,
+    // });
+    // router.back();
   };
 
   const handleToggleFavorite = () => {
@@ -356,7 +356,7 @@ export default function ItemView() {
             ₱{totalPrice}
           </ThemedText>
         </ThemedView>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.addToCartButton, { backgroundColor: theme.primary }]}
           onPress={handleAddToCart}
         >
@@ -365,7 +365,7 @@ export default function ItemView() {
           >
             Add to Cart
           </ThemedText>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ThemedView>
     </ThemedView>
   );

@@ -6,7 +6,6 @@ import { mockMenu } from "../../api/mockData";
 import MenuItem from "../../components/MenuItem";
 import { useFavorites } from "../../context/FavoritesContext";
 import { useThemeColors } from "../../context/ThemeContext";
-import WalletScreen from "./wallet";
 
 export default function MenuScreen() {
   const { theme } = useThemeColors();
@@ -53,8 +52,15 @@ export default function MenuScreen() {
   return (
     <ThemedView style={[styles.container]}>
       {/* Wallet Section */}
-      <ThemedView style={styles.walletWrapper}>
+      {/* <ThemedView style={styles.walletWrapper}>
         <WalletScreen />
+      </ThemedView> */}
+      <ThemedView style={{
+        overflow: 'hidden',
+        marginBottom: 10,
+        padding: 20
+      }}>
+        <ThemedText type="title">Hello, Guest.</ThemedText>
       </ThemedView>
 
       {/* Category Tabs */}
@@ -65,9 +71,9 @@ export default function MenuScreen() {
           data={categories}
           keyExtractor={(item) => item.id}
           renderItem={({ item: category }) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
-                styles.tab, 
+                styles.tab,
                 activeCategory === category.id && styles.activeTab
               ]}
               onPress={() => setActiveCategory(category.id)}
@@ -90,33 +96,30 @@ export default function MenuScreen() {
         />
       </ThemedView>
 
-          {/* Menu Grid */}
-          <FlatList
-            data={filteredMenu}
-            keyExtractor={(item) => item.id}
-            renderItem={renderMenuItem}
-            numColumns={2}
-            contentContainerStyle={styles.gridContainer}
-            columnWrapperStyle={styles.row}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                tintColor={theme.primary}
-                colors={[theme.primary]}
-                progressBackgroundColor={theme.background}
-              />
-            }
+      {/* Menu Grid */}
+      <FlatList
+        data={filteredMenu}
+        keyExtractor={(item) => item.id}
+        renderItem={renderMenuItem}
+        numColumns={2}
+        contentContainerStyle={styles.gridContainer}
+        columnWrapperStyle={styles.row}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+            progressBackgroundColor={theme.background}
           />
+        }
+      />
 
       {/* Checkout Button */}
       {/* <TouchableOpacity style={styles.checkoutButton}>
         <ThemedText style={styles.checkoutButtonText}>Checkout order</ThemedText>
       </TouchableOpacity> */}
-      <ThemedView style={[styles.checkoutButton, { backgroundColor: theme.muted }]}>
-        <ThemedText style={styles.checkoutButtonText}>Checkout order</ThemedText>
-      </ThemedView>
     </ThemedView>
   );
 }
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
   },
   walletWrapper: {
     overflow: 'hidden',
-    marginBottom:10
+    marginBottom: 10
   },
   tabContainer: {
     paddingHorizontal: 20,
