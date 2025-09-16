@@ -1,7 +1,8 @@
+import { ThemedButton } from "@/components/ThemedButton";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
-import { Button, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen() {
@@ -16,11 +17,11 @@ export default function LoginScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title">A&Y Sippop</ThemedText>
-      <Button title="Login" onPress={handleLogin} />
+      <ThemedButton title="Click here to start" onPress={handleLogin} />
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center" },
+  container: { flex: 1, alignItems: "center", justifyContent: "center", gap: 20 },
 });
