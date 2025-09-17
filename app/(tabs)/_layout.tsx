@@ -8,7 +8,7 @@ export default function TabLayout() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
-      <Tabs 
+        <Tabs 
         screenOptions={{ 
           headerShown: false,
           tabBarStyle: {
