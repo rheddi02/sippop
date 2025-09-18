@@ -51,10 +51,7 @@ export default function MenuScreen() {
 
   return (
     <ThemedView style={[styles.container]}>
-      {/* Wallet Section */}
-      {/* <ThemedView style={styles.walletWrapper}>
-        <WalletScreen />
-      </ThemedView> */}
+   
       <ThemedView style={{
         overflow: 'hidden',
         marginBottom: 10,

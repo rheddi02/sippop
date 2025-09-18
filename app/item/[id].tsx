@@ -325,7 +325,7 @@ export default function ItemView() {
             >
               <Ionicons name="remove" size={20} color={theme.background} />
             </TouchableOpacity>
-            <ThemedText style={[styles.quantityText, { color: theme.text }]}>
+            <ThemedText style={[styles.quantityText, { color: theme.background }]}>
               {quantity}
             </ThemedText>
             <TouchableOpacity

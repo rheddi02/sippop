@@ -30,12 +30,6 @@ export default function TabLayout() {
         }}
       >
       <Tabs.Screen 
-        name="wallet" 
-        options={{ 
-          href: null
-        }} 
-      />
-      <Tabs.Screen 
         name="menu" 
         options={{ 
           title: "Menu",

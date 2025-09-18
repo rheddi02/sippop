@@ -5,9 +5,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { useThemeColors } from "@/context/ThemeContext";
 import { useWallet } from "@/context/WalletContext";
 import { View } from "react-native";
-import { formatPesoDetailed } from "../../utils/amountHelper";
+import { formatPesoDetailed } from "../utils/amountHelper";
 
-export default function WalletScreen() {
+export default function Wallet() {
   const { balance, addFunds, deduct } = useWallet();
   const { theme } = useThemeColors();
 
