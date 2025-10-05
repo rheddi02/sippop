@@ -1,7 +1,8 @@
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { FlatList, RefreshControl, StyleSheet, TouchableOpacity } from "react-native";
+import { FlatList, RefreshControl, StyleSheet, TouchableOpacity, View } from "react-native";
 import { mockMenu } from "../../api/mockData";
 import MenuItem from "../../components/MenuItem";
 import { useFavorites } from "../../context/FavoritesContext";
@@ -51,13 +52,16 @@ export default function MenuScreen() {
 
   return (
     <ThemedView style={[styles.container]}>
-   
+
       <ThemedView style={{
         overflow: 'hidden',
-        marginBottom: 10,
-        padding: 20
+        padding: 20,
+        backgroundColor: theme.background,
       }}>
-        <ThemedText type="title">Hello, Guest.</ThemedText>
+        <View style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }}>
+          <Ionicons name="person-circle" size={32} color={theme.primary} />
+          <ThemedText type="title">Hello, Guest.</ThemedText>
+        </View>
       </ThemedView>
 
       {/* Category Tabs */}
