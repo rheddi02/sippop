@@ -12,7 +12,7 @@ export const CoffeeMenu = [
     name: "Caramel Macchiato",
     description:
       "Rich espresso with vanilla syrup, milk, and caramel drizzle. A coffee lover's dream in a glass.",
-    image: require("@/assets/images/webp/caramel-macchiato.webp"),
+    image: require("@/assets/images/coffee/caramel-macchiato.webp"),
     ...options,
   },
   {
@@ -20,7 +20,7 @@ export const CoffeeMenu = [
     name: "Spanish Latte",
     description:
       "Classic espresso with smooth spanish and creamy milk. Simple, elegant, and always satisfying.",
-    image: require("@/assets/images/webp/spanish-latte.webp"),
+    image: require("@/assets/images/coffee/spanish-latte.webp"),
     ...options,
   },
   {
@@ -28,7 +28,7 @@ export const CoffeeMenu = [
     name: "Strawberry Espresso",
     description:
       "Classic espresso with smooth strawberry and creamy milk. Simple, elegant, and always satisfying.",
-    image: require("@/assets/images/webp/strawberry-espresso.webp"),
+    image: require("@/assets/images/coffee/strawberry-espresso.webp"),
     ...options,
   },
 ];

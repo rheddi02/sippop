@@ -1,6 +1,6 @@
 export const sizes = [
-  { name: "12oz", price: 39, isAvailable: true, },
-  { name: "16oz", price: 49, isAvailable: true, },
+  { name: "12oz", price: 39, isAvailable: true },
+  { name: "16oz", price: 49, isAvailable: true },
 ];
 
 const options = {
@@ -14,7 +14,7 @@ export const MilkMenu = [
     name: "Strawberry Milk",
     description:
       "Fresh strawberry milk with a cool, fizzy twist. Perfect for hot days and refreshing moments.",
-    image: require("@/assets/images/webp/strawberry-milk.webp"),
+    image: require("@/assets/images/milk/strawberry-milk.webp"),
     ...options,
   },
   {
@@ -22,7 +22,7 @@ export const MilkMenu = [
     name: "Lychee Milk",
     description:
       "Fresh lychee milk with a cool, fizzy twist. Perfect for hot days and refreshing moments.",
-    image: require("@/assets/images/webp/lychee-milk.webp"),
+    image: require("@/assets/images/milk/lychee-milk.webp"),
     ...options,
   },
   {
@@ -30,7 +30,7 @@ export const MilkMenu = [
     name: "Green Apple Milk",
     description:
       "Fresh green apple milk with a cool, fizzy twist. Perfect for hot days and refreshing moments.",
-    image: require("@/assets/images/webp/green-apple-milk.webp"),
+    image: require("@/assets/images/milk/green-apple-milk.webp"),
     ...options,
   },
 
@@ -39,7 +39,7 @@ export const MilkMenu = [
     name: "Blueberry Milk",
     description:
       "Fresh blueberry milk with a cool, fizzy twist. Perfect for hot days and refreshing moments.",
-    image: require("@/assets/images/webp/blueberry-milk.webp"),
+    image: require("@/assets/images/milk/blueberry-milk.webp"),
     ...options,
   },
 ];

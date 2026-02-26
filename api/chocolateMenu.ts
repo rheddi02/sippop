@@ -11,7 +11,7 @@ export const ChocolateMenu = [
     name: "Chocolate Milk",
     description:
       "Rich chocolate milk with a cool, creamy texture. Perfect for satisfying your chocolate cravings.",
-    image: require("@/assets/images/webp/choco-milk.webp"),
+    image: require("@/assets/images/chocolate/choco-milk.webp"),
     ...options,
   },
   {
@@ -19,7 +19,7 @@ export const ChocolateMenu = [
     name: "Choco Strawberry",
     description:
       "Rich chocolate milk with a cool with strawberry flavor. Perfect for satisfying your chocolate cravings.",
-    image: require("@/assets/images/webp/choco-milk.webp"),
+    image: require("@/assets/images/chocolate/choco-strawberry.webp"),
     ...options,
   },
   {
@@ -27,7 +27,7 @@ export const ChocolateMenu = [
     name: "Choco Blueberry",
     description:
       "Rich chocolate milk with a cool with blueberry flavor. Perfect for satisfying your chocolate cravings.",
-    image: require("@/assets/images/webp/choco-milk.webp"),
+    image: require("@/assets/images/chocolate/choco-blueberry.webp"),
     ...options,
   },
   {
@@ -35,7 +35,7 @@ export const ChocolateMenu = [
     name: "Choco Espresso",
     description:
       "Rich chocolate milk with a cool with espresso flavor. Perfect for satisfying your chocolate cravings.",
-    image: require("@/assets/images/webp/choco-milk.webp"),
+    image: require("@/assets/images/chocolate/choco-espresso.webp"),
     ...options,
   },
 ];

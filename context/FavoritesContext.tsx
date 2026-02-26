@@ -1,5 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface FavoritesContextType {
   favorites: string[];
@@ -10,7 +16,7 @@ interface FavoritesContextType {
 
 const FavoritesContext = createContext<FavoritesContextType | null>(null);
 
-const FAVORITES_STORAGE_KEY = '@sippop_favorites';
+const FAVORITES_STORAGE_KEY = "@sippop_favorites";
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -20,13 +26,15 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadFavorites = async () => {
       try {
-        const savedFavorites = await AsyncStorage.getItem(FAVORITES_STORAGE_KEY);
+        const savedFavorites = await AsyncStorage.getItem(
+          FAVORITES_STORAGE_KEY,
+        );
         if (savedFavorites) {
           const parsedFavorites = JSON.parse(savedFavorites);
           setFavorites(parsedFavorites);
         }
       } catch (error) {
-        console.error('Error loading favorites:', error);
+        console.error("Error loading favorites:", error);
       } finally {
         setIsInitialized(true);
       }
@@ -36,17 +44,20 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleFavorite = async (id: string) => {
-    const newFavorites = favorites.includes(id) 
-      ? favorites.filter(favId => favId !== id)
+    const newFavorites = favorites.includes(id)
+      ? favorites.filter((favId) => favId !== id)
       : [...favorites, id];
-    
+
     setFavorites(newFavorites);
-    
+
     // Save to AsyncStorage
     try {
-      await AsyncStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(newFavorites));
+      await AsyncStorage.setItem(
+        FAVORITES_STORAGE_KEY,
+        JSON.stringify(newFavorites),
+      );
     } catch (error) {
-      console.error('Error saving favorites:', error);
+      console.error("Error saving favorites:", error);
     }
   };
 
@@ -57,12 +68,14 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     try {
       await AsyncStorage.removeItem(FAVORITES_STORAGE_KEY);
     } catch (error) {
-      console.error('Error clearing favorites:', error);
+      console.error("Error clearing favorites:", error);
     }
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, toggleFavorite, isFavorite, clearAllFavorites }}>
+    <FavoritesContext.Provider
+      value={{ favorites, toggleFavorite, isFavorite, clearAllFavorites }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
@@ -70,6 +83,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
 export const useFavorites = () => {
   const ctx = useContext(FavoritesContext);
-  if (!ctx) throw new Error('useFavorites must be used within FavoritesProvider');
+  if (!ctx)
+    throw new Error("useFavorites must be used within FavoritesProvider");
   return ctx;
 };

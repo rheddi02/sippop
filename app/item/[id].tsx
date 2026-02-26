@@ -45,7 +45,7 @@ export default function ItemView() {
 
   const handleAddToCart = () => {
     addToCart({
-      id: `${item.id}-${selectedSize.name}`,
+      id: `${item.id}`,
       name: `${item.name}`,
       quantity,
       price: basePrice,

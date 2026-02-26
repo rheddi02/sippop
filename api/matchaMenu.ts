@@ -11,7 +11,7 @@ export const MatchaMenu = [
     name: "Matcha Latte",
     description:
       "Rich matcha milk with a cool, creamy texture. Perfect for satisfying your matcha cravings.",
-    image: require("@/assets/images/webp/matcha-latte.webp"),
+    image: require("@/assets/images/matcha/matcha-latte.webp"),
     ...options,
   },
   {
@@ -19,7 +19,7 @@ export const MatchaMenu = [
     name: "Matcha Strawberry",
     description:
       "Rich matcha milk with a cool with strawberry flavor. Perfect for satisfying your matcha cravings.",
-    image: require("@/assets/images/webp/matcha-latte.webp"),
+    image: require("@/assets/images/matcha/matcha-strawberry.webp"),
     ...options,
   },
   {
@@ -27,7 +27,7 @@ export const MatchaMenu = [
     name: "Matcha Caramel",
     description:
       "Rich matcha milk with a cool with caramel flavor. Perfect for satisfying your matcha cravings.",
-    image: require("@/assets/images/webp/matcha-latte.webp"),
+    image: require("@/assets/images/matcha/matcha-caramel.webp"),
     ...options,
   },
   {
@@ -35,7 +35,7 @@ export const MatchaMenu = [
     name: "Matcha Espresso",
     description:
       "Rich matcha milk with a cool with espresso flavor. Perfect for satisfying your matcha cravings.",
-    image: require("@/assets/images/webp/matcha-latte.webp"),
+    image: require("@/assets/images/matcha/matcha-espresso.webp"),
     ...options,
   },
 ];
