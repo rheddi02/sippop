@@ -10,8 +10,9 @@ import { ThemedView } from "../ThemedView";
 type Props = {
   cart: CartItem[];
   handleCheckout: () => void;
+  loading: boolean;
 };
-const ItemSummary = ({ cart, handleCheckout }: Props) => {
+const ItemSummary = ({ cart, handleCheckout, loading }: Props) => {
   const { theme } = useThemeColors();
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -45,7 +46,8 @@ const ItemSummary = ({ cart, handleCheckout }: Props) => {
       <ThemedButton
         title="Checkout"
         onPress={handleCheckout}
-        disabled={cart.length === 0}
+        disabled={cart.length === 0 || loading}
+        loading={loading}
         style={[styles.checkoutButton, { backgroundColor: theme.primary }]}
       />
     </View>

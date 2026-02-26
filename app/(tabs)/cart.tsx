@@ -1,13 +1,13 @@
 import ItemCard from "@/components/cart/itemCard";
 import { useCart } from "../../context/CartContext";
 // import { useOrders } from "../../context/OrdersContext";
-import { getSizeName } from "@/utils/sizeHelper";
 import * as Clipboard from "expo-clipboard";
-import { Alert } from "react-native";
+import { useState } from "react";
+import { Alert, Linking } from "react-native";
 
 export default function CartScreen() {
   const { cart, updateQuantity, clearCart, removeFromCart } = useCart();
-  console.log("🚀 ~ CartScreen ~ cart:", cart);
+  const [loading, setLoading] = useState(false);
   // const { placeOrder } = useOrders();
 
   const handleCheckout = async () => {
@@ -30,12 +30,47 @@ export default function CartScreen() {
     if (cart.length === 0) return "";
 
     const lines = cart.map((item) => {
-      return `${item.quantity}pc - [${getSizeName(item.size)}] ${item.name} - ₱${item.price * item.quantity}`;
+      return `${item.quantity}pc - ${item.name} [${item.size}]`;
+      // return `${item.quantity}pc - [${getSizeName(item.size)}] ${item.name} - ₱${item.price * item.quantity}`;
     });
-    return `${lines.join("\n")}
+    return `🧾 ORDER\n\n${lines.join("\n")}
 `;
   };
+
+  const openMessengerCheckout = async () => {
+    if (cart.length === 0) return;
+    setLoading(true);
+
+    const message = encodeURIComponent(formatOrderText());
+
+    const PAGE_USERNAME = "aysippop";
+
+    const messengerWebUrl = `https://m.me/${PAGE_USERNAME}?text=${message}`;
+
+    try {
+      const supported = await Linking.canOpenURL(messengerWebUrl);
+
+      if (supported) {
+        await Linking.openURL(messengerWebUrl);
+      } else {
+        await Linking.openURL(messengerWebUrl);
+      }
+    } catch (err) {
+      Alert.alert("Error", "Unable to open Messenger");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <ItemCard {...{ updateQuantity, removeFromCart, handleCheckout, cart }} />
+    <ItemCard
+      {...{
+        updateQuantity,
+        removeFromCart,
+        handleCheckout: openMessengerCheckout,
+        cart,
+        loading,
+      }}
+    />
   );
 }

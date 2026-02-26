@@ -65,7 +65,6 @@ export default function MenuItem({
         variant="elevated"
         style={[styles.container, { width: itemWidth, height: 320 }]}
       >
-        {/* Favorite Heart Icon */}
         <View style={styles.favoriteButton}>
           <FavoriteButton
             isFavorite={isFavorite}
@@ -73,7 +72,6 @@ export default function MenuItem({
           />
         </View>
 
-        {/* Beverage Image */}
         <View style={styles.imageContainer}>
           {typeof image === "string" ? (
             <ThemedText style={styles.image}>{image}</ThemedText>
@@ -82,9 +80,7 @@ export default function MenuItem({
           )}
         </View>
 
-        {/* Content Container with Fixed Height */}
         <View style={styles.contentContainer}>
-          {/* Beverage Name */}
           <ThemedText
             type="subtitle"
             style={styles.name}
@@ -94,7 +90,6 @@ export default function MenuItem({
             {name}
           </ThemedText>
 
-          {/* Description */}
           <ThemedText
             type="caption"
             style={styles.description}
@@ -104,31 +99,8 @@ export default function MenuItem({
             {description}
           </ThemedText>
 
-          {/* Price Row */}
           <View style={styles.priceRow}>
-            {/* Price */}
             <MenuItemPrice sizes={sizes || [{ name: "Regular", price: 0 }]} />
-            {/* <ThemedText type="price" style={styles.price}>
-              {formatPesoForPrice(sizes && sizes.filter(size=>size.isAvailable).length > 0 ? sizes.filter(size=>size.isAvailable)[0].price : price)}
-            </ThemedText> */}
-
-            {/* Add to Cart Button */}
-            {/* <TouchableOpacity 
-              style={[
-                styles.addButton,
-                { backgroundColor: inCart ? theme.primary : theme.card }
-              ]}
-              onPress={handleAddToCart}
-            >
-              <ThemedText 
-                style={[
-                  styles.addButtonText,
-                  { color: inCart ? theme.background : theme.text }
-                ]}
-              >
-                +
-              </ThemedText>
-            </TouchableOpacity> */}
           </View>
         </View>
       </ThemedCard>

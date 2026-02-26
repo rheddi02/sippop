@@ -38,4 +38,13 @@ export const ChocolateMenu = [
     image: require("@/assets/images/chocolate/choco-espresso.webp"),
     ...options,
   },
+  {
+    id: "chocolate-5",
+    name: "Hot Chocolate Milk",
+    description:
+      "Rich chocolate milk with a hot, creamy texture. Perfect for satisfying your chocolate cravings.",
+    image: require("@/assets/images/chocolate/hot-choco-milk.webp"),
+    ...options,
+    sizes: [{ name: "8oz", price: 49, isAvailable: true }],
+  },
 ];

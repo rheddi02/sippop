@@ -14,8 +14,9 @@ type Props = {
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
   handleCheckout: () => void;
+  loading: boolean
 };
-const ItemCard = ({ cart, updateQuantity, removeFromCart, handleCheckout }: Props) => {
+const ItemCard = ({ cart, updateQuantity, removeFromCart, handleCheckout, loading }: Props) => {
   const { theme } = useThemeColors();
 
   return (
@@ -51,7 +52,7 @@ const ItemCard = ({ cart, updateQuantity, removeFromCart, handleCheckout }: Prop
         )}
       />
 
-    <ItemSummary {...{cart, handleCheckout}} />
+    <ItemSummary {...{cart, handleCheckout, loading}} />
     </ThemedView>
   );
 };

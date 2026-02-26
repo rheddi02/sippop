@@ -38,4 +38,13 @@ export const MatchaMenu = [
     image: require("@/assets/images/matcha/matcha-espresso.webp"),
     ...options,
   },
+  {
+    id: "matcha-5",
+    name: "Hot Matcha Latte",
+    description:
+      "Rich matcha milk with a hot, creamy texture. Perfect for satisfying your matcha cravings.",
+    image: require("@/assets/images/matcha/hot-matcha-latte.webp"),
+    ...options,
+    sizes: [{ name: "8oz", price: 49, isAvailable: true }],
+  },
 ];
