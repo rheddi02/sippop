@@ -13,22 +13,15 @@ export default function MenuItemPrice({ sizes }: MenuItemPriceProps) {
 
   return (
     <View style={styles.container}>
-      {sizes.map((size) => (
-        <ThemedText
-          key={size.name}
-          style={[
-            styles.price,
-            { borderColor: theme.border },
-            sizes.indexOf(size) === 0 ? styles.firstItem : null,
-            sizes.indexOf(size) === sizes.length - 1 ? styles.lastItem : null,
-          ]}
-        >
-          <Text style={{ color: theme.muted }}>{size.name}: &nbsp;</Text>
-          <Text style={{ color: theme.secondary }}>
-            {formatPesoForPrice(size.price)}
-          </Text>
-        </ThemedText>
-      ))}
+      <ThemedText key={sizes[0].name} style={[styles.price]}>
+        <Text style={{ color: theme.secondary }}>
+          {formatPesoForPrice(sizes[0].price)}
+        </Text>
+        &nbsp;
+        <Text style={{ color: theme.muted, fontSize: 12 }}>
+          {sizes[0].name}
+        </Text>
+      </ThemedText>
     </View>
   );
 }
@@ -42,20 +35,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   price: {
-    fontSize: 16,
     fontWeight: "bold",
-    borderWidth: 1,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-  },
-  firstItem: {
-    paddingLeft: 10,
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
-  },
-  lastItem: {
-    paddingRight: 10,
-    borderTopRightRadius: 20,
-    borderBottomRightRadius: 20,
+    fontSize: 16,
   },
 });
