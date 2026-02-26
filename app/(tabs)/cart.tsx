@@ -1,15 +1,29 @@
 import ItemCard from "@/components/cart/itemCard";
 import { useCart } from "../../context/CartContext";
 // import { useOrders } from "../../context/OrdersContext";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
-import { Alert, Linking } from "react-native";
+import { Alert, Linking, StyleSheet } from "react-native";
 
 export default function CartScreen() {
   const { cart, updateQuantity, clearCart, removeFromCart } = useCart();
   const [loading, setLoading] = useState(false);
   // const { placeOrder } = useOrders();
 
+  const handleClearCart = () => {
+    Alert.alert(
+      "Clear Cart",
+      "Are you sure you want to clear the cart?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Clear", style: "destructive", onPress: clearCart },
+      ],
+      { cancelable: true },
+    );
+  };
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     const orderText = formatOrderText();
@@ -63,14 +77,38 @@ export default function CartScreen() {
   };
 
   return (
-    <ItemCard
-      {...{
-        updateQuantity,
-        removeFromCart,
-        handleCheckout: openMessengerCheckout,
-        cart,
-        loading,
-      }}
-    />
+    <>
+      <ThemedView style={styles.container}>
+        <ThemedText bold type="title">
+          Cart
+        </ThemedText>
+        <Ionicons
+          disabled={cart.length === 0}
+          name="trash"
+          size={24}
+          color={cart.length === 0 ? "gray" : "red"}
+          onPress={handleClearCart}
+        />
+      </ThemedView>
+      <ItemCard
+        {...{
+          updateQuantity,
+          removeFromCart,
+          handleCheckout: openMessengerCheckout,
+          cart,
+          loading,
+        }}
+      />
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+});

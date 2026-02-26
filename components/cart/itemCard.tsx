@@ -2,7 +2,6 @@ import EmptyCart from "@/components/cart/emptyCart";
 import ItemName from "@/components/cart/itemName";
 import ItemPrice from "@/components/cart/itemPrice";
 import ItemQuantity from "@/components/cart/itemQuantity";
-import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
@@ -14,9 +13,15 @@ type Props = {
   updateQuantity: (id: string, quantity: number) => void;
   removeFromCart: (id: string) => void;
   handleCheckout: () => void;
-  loading: boolean
+  loading: boolean;
 };
-const ItemCard = ({ cart, updateQuantity, removeFromCart, handleCheckout, loading }: Props) => {
+const ItemCard = ({
+  cart,
+  updateQuantity,
+  removeFromCart,
+  handleCheckout,
+  loading,
+}: Props) => {
   const { theme } = useThemeColors();
 
   return (
@@ -32,11 +37,17 @@ const ItemCard = ({ cart, updateQuantity, removeFromCart, handleCheckout, loadin
               { backgroundColor: theme.border, borderRadius: 8 },
             ]}
           >
-            <Image
-              source={item.image}
-              style={styles.image}
-              resizeMode="cover"
-            />
+            <ThemedView
+              style={{
+                padding: 8,
+                marginRight: 12,
+                borderRadius: 8,
+                overflow: "hidden",
+                backgroundColor: theme.muted + 20,
+              }}
+            >
+              <Image source={item.image} style={styles.image} />
+            </ThemedView>
             <View style={[styles.item]}>
               <ItemName item={item} removeFromCart={removeFromCart} />
               <View style={styles.itemPriceQuantity}>
@@ -52,7 +63,7 @@ const ItemCard = ({ cart, updateQuantity, removeFromCart, handleCheckout, loadin
         )}
       />
 
-    <ItemSummary {...{cart, handleCheckout, loading}} />
+      <ItemSummary {...{ cart, handleCheckout, loading }} />
     </ThemedView>
   );
 };
