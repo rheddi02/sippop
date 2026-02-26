@@ -1,0 +1,34 @@
+const sizes = [{ name: "16oz", price: 49, isAvailable: true }];
+
+const options = {
+  sizes,
+  category: "coffee",
+  isFavorite: false,
+  variants: ["hot", "iced"],
+};
+export const CoffeeMenu = [
+  {
+    id: "coffee-1",
+    name: "Caramel Macchiato",
+    description:
+      "Rich espresso with vanilla syrup, milk, and caramel drizzle. A coffee lover's dream in a glass.",
+    image: require("@/assets/images/webp/caramel-macchiato.webp"),
+    ...options,
+  },
+  {
+    id: "coffee-2",
+    name: "Spanish Latte",
+    description:
+      "Classic espresso with smooth spanish and creamy milk. Simple, elegant, and always satisfying.",
+    image: require("@/assets/images/webp/spanish-latte.webp"),
+    ...options,
+  },
+  {
+    id: "coffee-3",
+    name: "Strawberry Espresso",
+    description:
+      "Classic espresso with smooth strawberry and creamy milk. Simple, elegant, and always satisfying.",
+    image: require("@/assets/images/webp/strawberry-espresso.webp"),
+    ...options,
+  },
+];

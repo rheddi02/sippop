@@ -1,71 +1,46 @@
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import ItemCard from "@/components/cart/itemCard";
 import { useCart } from "../../context/CartContext";
-import { useOrders } from "../../context/OrdersContext";
+// import { useOrders } from "../../context/OrdersContext";
+import * as Clipboard from "expo-clipboard";
+import { Alert } from "react-native";
 
 export default function CartScreen() {
   const { cart, updateQuantity, clearCart, removeFromCart } = useCart();
-  const { placeOrder } = useOrders();
+  // const { placeOrder } = useOrders();
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
-    placeOrder(
-      cart,
-      cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+    const orderText = formatOrderText();
+    await Clipboard.setStringAsync(orderText);
+
+    Alert.alert(
+      "Order copied ✅",
+      "Your order has been copied. Paste it in Messenger to order.",
     );
-    clearCart();
+    // placeOrder(
+    //   cart,
+    //   cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
+    // );
+    // clearCart();
   };
 
-  return (
-    <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <ThemedText style={{ fontSize: 18, marginBottom: 20 }}>This page is under development.</ThemedText>
-    </ThemedView>
-  )
-  // return (
-  //   <ThemedView style={{ flex: 1, padding: 16 }}>
-  //     <FlatList
-  //       data={cart}
-  //       keyExtractor={(item) => item.id}
-  //       ListEmptyComponent={
-          
-  //           <ThemedText>Your cart is empty.</ThemedText>
-  //       }
-  //       renderItem={({ item }) => (
-  //         <ThemedView
-  //           style={{
-  //             padding: 12,
-  //             borderBottomWidth: 1,
-  //             borderColor: "#ccc",
-  //             flexDirection: "row",
-  //             justifyContent: "space-between",
-  //             alignItems: "center",
-  //           }}
-  //         >
-  //           <ThemedText>
-  //             {item.name} x {item.quantity} = ₱{item.price * item.quantity}
-  //           </ThemedText>
-  //           <View style={{ flexDirection: "row", gap: 4 }}>
-  //             <Button
-  //               title="-"
-  //               onPress={() => updateQuantity(item.id, item.quantity - 1)}
-  //             />
-  //             <Button
-  //               title="+"
-  //               onPress={() => updateQuantity(item.id, item.quantity + 1)}
-  //             />
-  //             <Button title="Remove" onPress={() => removeFromCart(item.id)} />
-  //           </View>
-  //         </ThemedView>
-  //       )}
-  //     />
+  const formatOrderText = () => {
+    if (cart.length === 0) return "";
 
-  //     {/* {cart.length > 0 && (
-  //       <ThemedView style={{ marginTop: 20 }}>
-  //         <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>
-  //           Total: ₱{cart.reduce((acc, item) => acc + item.price * item.quantity, 0)}
-  //         </ThemedText>
-  //       </ThemedView>
-  //     )} */}
-  //   </ThemedView>
-  // );
+    const lines = cart.map((item) => {
+      return `${item.quantity}pc - ${item.size} ${item.name} - ₱${item.price * item.quantity}`;
+    });
+
+    const total = cart.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0,
+    );
+
+    return `${lines.join("\n")}
+
+Total: ₱${total}`;
+  };
+  return (
+    <ItemCard {...{ updateQuantity, removeFromCart, handleCheckout, cart }} />
+  );
 }

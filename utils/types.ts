@@ -2,8 +2,11 @@
 export interface Product {
   id: string;
   name: string;
+  quantity: number;
   price: number;
-  points: number; // how many points the product gives
+  image: number
+  size: string
+  // points: number; // how many points the product gives
 }
 
 // Cart item type

@@ -1,5 +1,5 @@
 import { CartItem, Product } from "@/utils/types";
-import React, { createContext, useState, ReactNode, useContext } from "react";
+import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface CartContextType {
   cart: CartItem[];
@@ -20,17 +20,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (existing) {
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+            ? { ...item, quantity: item.quantity + product.quantity }
+            : item,
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: product.quantity }];
     });
   };
 
   const updateQuantity = (id: string, qty: number) => {
     setCart((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity: qty } : item))
+      prev.map((item) => (item.id === id ? { ...item, quantity: qty } : item)),
     );
   };
 
@@ -41,7 +41,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, updateQuantity, clearCart, removeFromCart }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, updateQuantity, clearCart, removeFromCart }}
+    >
       {children}
     </CartContext.Provider>
   );

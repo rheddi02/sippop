@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import { useEffect } from "react";
+import { Alert } from "react-native";
 
 function AppContent() {
   const { isDark } = useThemeColors();
@@ -18,7 +19,16 @@ function AppContent() {
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
           await Updates.fetchUpdateAsync();
-          await Updates.reloadAsync();
+          Alert.alert(
+          "Update Available",
+          "App will restart to apply updates.",
+          [
+            {
+              text: "Update",
+              onPress: () => Updates.reloadAsync(),
+            },
+          ]
+        );
         }
       } catch (error) {
         console.log("Error checking for updates:", error);

@@ -14,7 +14,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -27,13 +27,12 @@ export default function ItemView() {
   const { isFavorite, toggleFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
 
-  const item = mockMenu.find((pizza) => pizza.id === id)!;
+  const item = mockMenu.find((item) => item.id === id)!;
 
   const [selectedSize, setSelectedSize] = useState(
-    item.sizes.find((size) => size.isAvailable) || item.sizes[0]
+    item.sizes.find((size) => size.isAvailable) || item.sizes[0],
   );
   const [quantity, setQuantity] = useState(1);
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
 
   // Parallax animation
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -42,35 +41,22 @@ export default function ItemView() {
 
   const basePrice = selectedSize.price;
 
-  // Calculate addon costs
-  const addonCosts = selectedAddons.reduce((total, addonName) => {
-    const addon = item.addOns?.find(addon => addon.name === addonName);
-    return total + (addon?.price || 0);
-  }, 0);
-
-  const totalPrice = (basePrice + addonCosts) * quantity;
+  const totalPrice = basePrice * quantity;
 
   const handleAddToCart = () => {
-    // const addonNames = selectedAddons.length > 0 ? ` + ${selectedAddons.join(', ')}` : '';
-    // addToCart({
-    //   id: `${item.id}-${selectedSize.name}${selectedAddons.length > 0 ? `-${selectedAddons.join('-')}` : ''}`,
-    //   name: `${item.name} (${selectedSize.name})${addonNames}`,
-    //   price: totalPrice,
-    //   points: item.points,
-    // });
-    // router.back();
+    addToCart({
+      id: `${item.id}-${selectedSize.name}`,
+      name: `${item.name}`,
+      quantity,
+      price: basePrice,
+      image: item.image,
+      size: selectedSize.name,
+    });
+    router.back();
   };
 
   const handleToggleFavorite = () => {
     toggleFavorite(item.id);
-  };
-
-  const handleToggleAddon = (addonName: string) => {
-    setSelectedAddons(prev =>
-      prev.includes(addonName)
-        ? prev.filter(name => name !== addonName)
-        : [...prev, addonName]
-    );
   };
 
   return (
@@ -94,9 +80,11 @@ export default function ItemView() {
         >
           <Ionicons name="arrow-back" size={24} color={theme.text} />
         </TouchableOpacity>
-        <FavoriteButton isFavorite={isFavorite(item.id)}
+        <FavoriteButton
+          isFavorite={isFavorite(item.id)}
           onToggle={handleToggleFavorite}
-          size="large" />
+          size="large"
+        />
       </ThemedView>
 
       <ScrollView
@@ -104,7 +92,7 @@ export default function ItemView() {
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         scrollEventThrottle={16}
       >
@@ -218,91 +206,6 @@ export default function ItemView() {
           </View>
         </ThemedView>
 
-        {/* Addons Selection */}
-        {item.addOns && item.addOns.length > 0 && (
-          <ThemedView
-            style={[styles.sectionContainer, { backgroundColor: theme.card }]}
-          >
-            <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>
-              Add-ons
-            </ThemedText>
-            <View style={styles.addonsContainer}>
-              {item.addOns.map((addon) => (
-                <TouchableOpacity
-                  key={addon.name}
-                  style={[
-                    styles.addonOption,
-                    selectedAddons.includes(addon.name) && styles.selectedAddon,
-                    !addon.isAvailable && styles.disabledAddon,
-                    {
-                      borderColor: selectedAddons.includes(addon.name)
-                        ? theme.primary
-                        : !addon.isAvailable
-                          ? theme.muted
-                          : theme.border,
-                      backgroundColor: selectedAddons.includes(addon.name)
-                        ? theme.primary + "20"
-                        : !addon.isAvailable
-                          ? theme.muted + "20"
-                          : "transparent",
-                    },
-                  ]}
-                  onPress={() => addon.isAvailable && handleToggleAddon(addon.name)}
-                  disabled={!addon.isAvailable}
-                >
-                  <View style={styles.addonContent}>
-                    <ThemedText
-                      style={[
-                        styles.addonName,
-                        {
-                          color: selectedAddons.includes(addon.name)
-                            ? theme.primary
-                            : !addon.isAvailable
-                              ? theme.muted
-                              : theme.text,
-                        },
-                      ]}
-                    >
-                      {addon.name}
-                    </ThemedText>
-                    <ThemedText
-                      style={[
-                        styles.addonPrice,
-                        {
-                          color: selectedAddons.includes(addon.name)
-                            ? theme.primary
-                            : !addon.isAvailable
-                              ? theme.muted
-                              : theme.muted,
-                        },
-                      ]}
-                    >
-                      +₱{addon.price}
-                    </ThemedText>
-                  </View>
-                  <View
-                    style={[
-                      styles.checkbox,
-                      {
-                        borderColor: selectedAddons.includes(addon.name)
-                          ? theme.primary
-                          : theme.border,
-                        backgroundColor: selectedAddons.includes(addon.name)
-                          ? theme.primary
-                          : "transparent",
-                      },
-                    ]}
-                  >
-                    {selectedAddons.includes(addon.name) && (
-                      <Ionicons name="checkmark" size={16} color={theme.background} />
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ThemedView>
-        )}
-
         {/* Quantity Selection */}
         <ThemedView
           style={[styles.sectionContainer, { backgroundColor: theme.card }]}
@@ -325,7 +228,9 @@ export default function ItemView() {
             >
               <Ionicons name="remove" size={20} color={theme.background} />
             </TouchableOpacity>
-            <ThemedText style={[styles.quantityText, { color: theme.background }]}>
+            <ThemedText
+              style={[styles.quantityText, { color: theme.background }]}
+            >
               {quantity}
             </ThemedText>
             <TouchableOpacity
@@ -356,7 +261,7 @@ export default function ItemView() {
             ₱{totalPrice}
           </ThemedText>
         </ThemedView>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           style={[styles.addToCartButton, { backgroundColor: theme.primary }]}
           onPress={handleAddToCart}
         >
@@ -365,7 +270,7 @@ export default function ItemView() {
           >
             Add to Cart
           </ThemedText>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </ThemedView>
     </ThemedView>
   );
@@ -390,7 +295,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
     borderWidth: 1,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -473,35 +378,6 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     letterSpacing: 3,
   },
-  addonsContainer: {
-    gap: 12,
-  },
-  addonOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-  },
-  selectedAddon: {
-    // backgroundColor handled in style prop
-  },
-  disabledAddon: {
-    opacity: 0.6,
-  },
-  addonContent: {
-    flex: 1,
-  },
-  addonName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  addonPrice: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
   checkbox: {
     width: 24,
     height: 24,
@@ -518,7 +394,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   quantityButton: {
-    width: '40%',
+    width: "40%",
     height: 40,
     borderRadius: 20,
     alignItems: "center",
