@@ -1,17 +1,16 @@
 import ItemCard from "@/components/cart/itemCard";
-import { useCart } from "../../context/CartContext";
-// import { useOrders } from "../../context/OrdersContext";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useThemeColors } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Alert, Linking, StyleSheet } from "react-native";
+import { useCart } from "../../context/CartContext";
 
 export default function CartScreen() {
   const { cart, updateQuantity, clearCart, removeFromCart } = useCart();
   const [loading, setLoading] = useState(false);
-  // const { placeOrder } = useOrders();
+  const { theme } = useThemeColors();
 
   const handleClearCart = () => {
     Alert.alert(
@@ -24,28 +23,22 @@ export default function CartScreen() {
       { cancelable: true },
     );
   };
-  const handleCheckout = async () => {
-    if (cart.length === 0) return;
-    const orderText = formatOrderText();
-    await Clipboard.setStringAsync(orderText);
+  // const handleCheckout = async () => {
+  //   if (cart.length === 0) return;
+  //   const orderText = formatOrderText();
+  //   await Clipboard.setStringAsync(orderText);
 
-    Alert.alert(
-      "Order copied ✅",
-      "Your order has been copied. Paste it in Messenger to order.",
-    );
-    // placeOrder(
-    //   cart,
-    //   cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
-    // );
-    // clearCart();
-  };
+  //   Alert.alert(
+  //     "Order copied ✅",
+  //     "Your order has been copied. Paste it in Messenger to order.",
+  //   );
+  // };
 
   const formatOrderText = () => {
     if (cart.length === 0) return "";
 
     const lines = cart.map((item) => {
       return `${item.quantity}pc - ${item.name} [${item.size}]`;
-      // return `${item.quantity}pc - [${getSizeName(item.size)}] ${item.name} - ₱${item.price * item.quantity}`;
     });
     return `🧾 ORDER\n\n${lines.join("\n")}
 `;
@@ -82,13 +75,25 @@ export default function CartScreen() {
         <ThemedText bold type="title">
           Cart
         </ThemedText>
-        <Ionicons
-          disabled={cart.length === 0}
-          name="trash"
-          size={24}
-          color={cart.length === 0 ? "gray" : "red"}
-          onPress={handleClearCart}
-        />
+        <ThemedText>
+          {cart.length} item{cart.length > 1 ? "s" : ""}
+        </ThemedText>
+        <ThemedView
+          style={{
+            padding: 8,
+            borderWidth: 1,
+            borderColor: theme.border,
+            borderRadius: 8,
+          }}
+        >
+          <Ionicons
+            disabled={cart.length === 0}
+            name="trash"
+            size={24}
+            color={cart.length === 0 ? "gray" : "red"}
+            onPress={handleClearCart}
+          />
+        </ThemedView>
       </ThemedView>
       <ItemCard
         {...{

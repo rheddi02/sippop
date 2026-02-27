@@ -5,7 +5,8 @@ import ItemQuantity from "@/components/cart/itemQuantity";
 import { ThemedView } from "@/components/ThemedView";
 import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
-import { FlatList, Image, StyleSheet, View } from "react-native";
+import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
 import ItemSummary from "./itemSummary";
 
 type Props = {
@@ -31,35 +32,49 @@ const ItemCard = ({
         keyExtractor={(item) => item.id}
         ListEmptyComponent={<EmptyCart />}
         renderItem={({ item }) => (
-          <ThemedView
-            style={[
-              styles.cartItem,
-              { backgroundColor: theme.border, borderRadius: 8 },
-            ]}
+          <Swipeable
+            renderRightActions={() => (
+              <RectButton
+                style={[
+                  styles.deleteButton,
+                  { backgroundColor: theme.danger || "red" },
+                ]}
+                onPress={() => removeFromCart(item.id)}
+              >
+                <Text style={styles.deleteText}>Delete</Text>
+              </RectButton>
+            )}
           >
             <ThemedView
-              style={{
-                padding: 8,
-                marginRight: 12,
-                borderRadius: 8,
-                overflow: "hidden",
-                backgroundColor: theme.muted + 20,
-              }}
+              style={[
+                styles.cartItem,
+                { backgroundColor: theme.border, borderRadius: 8 },
+              ]}
             >
-              <Image source={item.image} style={styles.image} />
-            </ThemedView>
-            <View style={[styles.item]}>
-              <ItemName item={item} removeFromCart={removeFromCart} />
-              <View style={styles.itemPriceQuantity}>
-                <ItemPrice item={item} />
-                <ItemQuantity
-                  item={item}
-                  updateQuantity={updateQuantity}
-                  removeFromCart={removeFromCart}
-                />
+              <ThemedView
+                style={{
+                  padding: 8,
+                  marginRight: 12,
+                  borderRadius: 8,
+                  overflow: "hidden",
+                  backgroundColor: theme.muted + 20,
+                }}
+              >
+                <Image source={item.image} style={styles.image} />
+              </ThemedView>
+              <View style={[styles.item]}>
+                <ItemName item={item} removeFromCart={removeFromCart} />
+                <View style={styles.itemPriceQuantity}>
+                  <ItemPrice item={item} />
+                  <ItemQuantity
+                    item={item}
+                    updateQuantity={updateQuantity}
+                    removeFromCart={removeFromCart}
+                  />
+                </View>
               </View>
-            </View>
-          </ThemedView>
+            </ThemedView>
+          </Swipeable>
         )}
       />
 
@@ -89,7 +104,19 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    height: 100,
-    width: 100,
+    height: 80,
+    width: 80,
+  },
+  deleteButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 70,
+    marginVertical: 14,
+    marginTop: 0,
+    borderRadius: 8,
+  },
+  deleteText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

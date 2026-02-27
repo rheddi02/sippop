@@ -12,56 +12,60 @@ type Props = {
   handleCheckout: () => void;
   loading: boolean;
 };
-const ItemSummary = ({ cart, handleCheckout, loading }: Props) => {
+const ItemSummaryStyle2 = ({ cart, handleCheckout, loading }: Props) => {
   const { theme } = useThemeColors();
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <ThemedView
         style={{
+          marginTop: 20,
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
         }}
       >
-        <ThemedText style={styles.checkoutPrice}>
+        <ThemedText
+          style={{
+            fontSize: 18,
+          }}
+        >
+          Total:
+        </ThemedText>
+        <ThemedText
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+          }}
+        >
           {formatPesoForCart(
             cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
           )}
         </ThemedText>
-        <ThemedButton
-          title="Checkout"
-          onPress={handleCheckout}
-          disabled={cart.length === 0 || loading}
-          loading={loading}
-          style={[styles.checkoutButton, { backgroundColor: theme.primary }]}
-        />
       </ThemedView>
+      {/* Checkout Button */}
+      <ThemedButton
+        title="Checkout"
+        onPress={handleCheckout}
+        disabled={cart.length === 0 || loading}
+        loading={loading}
+        style={[styles.checkoutButton, { backgroundColor: theme.primary }]}
+      />
     </View>
   );
 };
 
-export default ItemSummary;
+export default ItemSummaryStyle2;
 
 const styles = StyleSheet.create({
   container: {
     borderTopWidth: 1,
-    paddingTop: 20,
-  },
-  checkoutPrice: {
-    fontSize: 32,
-    fontWeight: "bold",
-    lineHeight: 32,
-    marginRight: 20,
   },
   checkoutButton: {
-    marginTop: 0,
+    marginTop: 20,
     height: 50,
     borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
-    flexGrow: 1,
   },
   checkoutButtonText: {
     fontSize: 18,

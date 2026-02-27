@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   quantityButton: {
     width: "30%",
-    height: 30,
+    height: 40,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
