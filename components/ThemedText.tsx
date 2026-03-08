@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextProps } from 'react-native';
 import { useThemeColors } from '../context/ThemeContext';
 
 interface ThemedTextProps extends TextProps {
-  type?: 'title' | 'subtitle' | 'body' | 'caption' | 'price' | 'label';
+  type?: 'title' | 'subtitle' | 'body' | 'caption' | 'price' | 'label' | 'defaultSemiBold';
   bold?: boolean;
   children: React.ReactNode;
 }
@@ -29,8 +29,10 @@ export function ThemedText({
         return [styles.caption, { color: theme.muted }];
       case 'price':
         return [styles.price, { color: theme.primary }];
-      case 'label':
-        return [styles.label, { color: theme.text }];
+        case 'label':
+          return [styles.label, { color: theme.text }];
+      case 'defaultSemiBold':
+        return [styles.defaultSemiBold, { color: theme.text }];
       default:
         return [styles.body, { color: theme.text }];
     }
@@ -53,6 +55,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     lineHeight: 24,
+  },
+  defaultSemiBold: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '600',
   },
   body: {
     fontSize: 16,
