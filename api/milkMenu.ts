@@ -1,6 +1,6 @@
 export const sizes = [
-  { name: "12oz", price: 39, isAvailable: true },
-  { name: "16oz", price: 49, isAvailable: true },
+  { name: "12oz", price: 40, isAvailable: true },
+  { name: "16oz", price: 50, isAvailable: true },
 ];
 
 const options = {

@@ -1,6 +1,6 @@
 const sizes = [
-  { name: "12oz", price: 29, isAvailable: true },
-  { name: "16oz", price: 39, isAvailable: true },
+  { name: "12oz", price: 30, isAvailable: true },
+  { name: "16oz", price: 40, isAvailable: true },
 ];
 
 const options = {

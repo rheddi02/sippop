@@ -1,4 +1,4 @@
-const sizes = [{ name: "16oz", price: 59, isAvailable: true }];
+const sizes = [{ name: "16oz", price: 65, isAvailable: true }];
 
 const options = {
   sizes,
