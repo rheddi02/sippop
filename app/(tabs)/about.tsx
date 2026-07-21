@@ -1,5 +1,5 @@
 import { ExternalLink } from "@/components/external-link";
-import { Spacer } from "@/components/Spacer";
+import Spacer from "@/components/Spacer";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";

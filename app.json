@@ -19,6 +19,7 @@
         "monochromeImage": "./assets/images/icon.png"
       },
       "package": "com.aysippop.store",
+      "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "userInterfaceStyle": "automatic"
@@ -42,10 +43,17 @@
         }
       ],
       "expo-secure-store",
+      "@react-native-google-signin/google-signin",
       [
-        "@react-native-google-signin/google-signin",
+        "react-native-fbsdk-next",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.588895072747-mj8ugnkeo7nepdbrg5gguqoaha9jvaqn"
+          "appID": "1702944317602322",
+          "clientToken": "7623b5a49bc7a4c08ba577b102e74095",
+          "displayName": "Aysippop Store",
+          "scheme": "fb1702944317602322",
+          "advertiserIDCollectionEnabled": false,
+          "autoLogAppEventsEnabled": false,
+          "isAutoInitEnabled": true
         }
       ]
     ],

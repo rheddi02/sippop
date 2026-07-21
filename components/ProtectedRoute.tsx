@@ -8,13 +8,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user && isAuthChecked) {
+    if (!isAuthChecked) return;
+    if (!user) {
       router.push("/login");
+    } else if (!user.emailVerified) {
+      router.push("/verify-email");
     }
   }, [user, isAuthChecked, router]);
 
-  if (!user || !isAuthChecked) {
-    return <ThemedLoader />
+  if (!isAuthChecked || !user || !user.emailVerified) {
+    return <ThemedLoader />;
   }
   return children;
 };

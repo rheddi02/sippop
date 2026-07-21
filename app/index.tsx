@@ -18,9 +18,11 @@ export default function IndexScreen() {
     );
   }
 
-  // Redirect based on authentication status
-  if (user) {
+  // Redirect based on authentication and verification status
+  if (user && user.emailVerified) {
     return <Redirect href="/(tabs)/menu" />;
+  } else if (user && !user.emailVerified) {
+    return <Redirect href="/verify-email" />;
   } else {
     return <Redirect href="/login" />;
   }

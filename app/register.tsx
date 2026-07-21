@@ -10,7 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -57,10 +56,33 @@ const RegisterScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState("");
 
-  const { register } = useUser();
+  const { register, sendVerificationEmail, loginWithGoogle, loginWithFacebook } =
+    useUser();
   const handleRegister = async () => {
     try {
       await register(email, password);
+      await sendVerificationEmail();
+      router.replace("/verify-email");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrors(message);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await loginWithGoogle();
+      router.replace("/");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrors(message);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    try {
+      await loginWithFacebook();
+      router.replace("/");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       setErrors(message);
@@ -134,14 +156,14 @@ const RegisterScreen = () => {
             icon="logo-google"
             color={theme.text}
             label="Continue with Google"
-            onPress={() => Alert.alert("Not yet implemented")}
+            onPress={handleGoogleSignIn}
           />
 
           <SocialButton
             icon="logo-facebook"
             color={theme.text}
             label="Continue with Facebook"
-            onPress={() => Alert.alert("Not yet implemented")}
+            onPress={handleFacebookSignIn}
           />
 
           <Spacer height={12} />

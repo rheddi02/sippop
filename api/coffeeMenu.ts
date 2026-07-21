@@ -38,7 +38,7 @@ export const CoffeeMenu = [
       "Classic espresso with smooth spanish and creamy milk. Simple, elegant, and always satisfying.",
     image: require("@/assets/images/coffee/hot-spanish-latte.webp"),
     ...options,
-    sizes: [{ name: "8oz", price: 49, isAvailable: true }],
+    sizes: [{ name: "8oz", price: 55, isAvailable: true }],
   },
   {
     id: "coffee-5",
@@ -47,6 +47,6 @@ export const CoffeeMenu = [
       "Classic espresso with smooth caramel and creamy milk. Simple, elegant, and always satisfying.",
     image: require("@/assets/images/coffee/hot-caramel-macchiato.webp"),
     ...options,
-    sizes: [{ name: "8oz", price: 49, isAvailable: true }],
+    sizes: [{ name: "8oz", price: 55, isAvailable: true }],
   },
 ];

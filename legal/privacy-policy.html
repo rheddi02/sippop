@@ -1,0 +1,434 @@
+<title>Privacy Policy — A&Y Sippop</title>
+<style>
+  :root {
+    --paper: #f3f1ea;
+    --ink: #241f19;
+    --ink-soft: #55503f;
+    --accent: #4c5c40;
+    --accent-warm: #b9793d;
+    --line: #ddd7c7;
+    --panel: #eae4d3;
+    --code-bg: #e9e3d2;
+
+    --font-display: ui-serif, Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #18130e;
+      --ink: #ece5d6;
+      --ink-soft: #b7ae98;
+      --accent: #8fb07a;
+      --accent-warm: #e0a868;
+      --line: #362d21;
+      --panel: #221b13;
+      --code-bg: #241d15;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #18130e;
+    --ink: #ece5d6;
+    --ink-soft: #b7ae98;
+    --accent: #8fb07a;
+    --accent-warm: #e0a868;
+    --line: #362d21;
+    --panel: #221b13;
+    --code-bg: #241d15;
+  }
+  :root[data-theme="light"] {
+    --paper: #f3f1ea;
+    --ink: #241f19;
+    --ink-soft: #55503f;
+    --accent: #4c5c40;
+    --accent-warm: #b9793d;
+    --line: #ddd7c7;
+    --panel: #eae4d3;
+    --code-bg: #e9e3d2;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: 0 20px 96px;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--accent-warm); }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent-warm);
+    outline-offset: 3px;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Masthead */
+  header.masthead {
+    padding: 64px 0 32px;
+    border-bottom: 1px solid var(--line);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2rem, 5vw, 2.6rem);
+    line-height: 1.15;
+    margin: 10px 0 14px;
+    text-wrap: balance;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .meta span::before { content: "·"; margin-right: 18px; color: var(--line); }
+  .meta span:first-child::before { content: none; margin-right: 0; }
+
+  /* Summary panel */
+  .summary {
+    margin-top: 32px;
+    background: var(--panel);
+    border-radius: 4px;
+    padding: 24px 28px;
+    display: grid;
+    gap: 14px;
+  }
+  .summary h2 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin: 0;
+  }
+  .summary ul {
+    margin: 0;
+    padding-left: 1.1em;
+    display: grid;
+    gap: 8px;
+  }
+  .summary li { color: var(--ink); }
+  .summary strong { color: var(--ink); }
+
+  /* Contents */
+  nav.toc {
+    margin: 40px 0 8px;
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.toc h2 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+  }
+  nav.toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    columns: 2;
+    column-gap: 24px;
+  }
+  nav.toc li { break-inside: avoid; margin-bottom: 8px; }
+  nav.toc a { color: var(--ink); text-decoration: none; }
+  nav.toc a:hover { color: var(--accent-warm); }
+  nav.toc .num {
+    font-family: var(--font-mono);
+    color: var(--accent);
+    margin-right: 8px;
+    font-size: 13px;
+  }
+
+  /* Sections */
+  main { padding-top: 8px; }
+  section {
+    padding: 40px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  section:last-of-type { border-bottom: none; }
+
+  h2.section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  h2.section-title .num {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    color: var(--accent-warm);
+  }
+
+  section p { margin: 0 0 14px; max-width: 62ch; color: var(--ink); }
+  section p.soft { color: var(--ink-soft); }
+  section ul, section ol.plain {
+    margin: 0 0 14px;
+    padding-left: 1.2em;
+    max-width: 62ch;
+    display: grid;
+    gap: 8px;
+  }
+
+  h3.sub {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 24px 0 8px;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--code-bg);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+  }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; margin: 8px 0 18px; }
+  table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  thead th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding: 0 12px 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody td {
+    padding: 14px 12px 14px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.label { font-weight: 700; white-space: nowrap; }
+  td.soft { color: var(--ink-soft); }
+
+  /* Contact card */
+  .contact-card {
+    background: var(--panel);
+    border-radius: 4px;
+    padding: 24px 28px;
+    display: grid;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .contact-card dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 20px;
+    margin: 0;
+  }
+  .contact-card dt {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+  .contact-card dd { margin: 0; }
+
+  footer {
+    padding-top: 40px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  footer p { max-width: 62ch; }
+
+  @media (max-width: 560px) {
+    header.masthead { padding-top: 44px; }
+    nav.toc ol { columns: 1; }
+    .summary, .contact-card { padding: 20px; }
+  }
+</style>
+
+<div class="page">
+  <header class="masthead">
+    <div class="eyebrow">A&amp;Y Sippop · Aysippop Store App</div>
+    <h1>Privacy Policy</h1>
+    <div class="meta">
+      <span>Last updated July 21, 2026</span>
+      <span>Applies to the Aysippop Store mobile app</span>
+    </div>
+
+    <div class="summary">
+      <h2>In short</h2>
+      <ul>
+        <li><strong>We collect your email</strong> (and your name/photo if you sign in with Google or Facebook) to run your account.</li>
+        <li><strong>Your password is never seen by us</strong> — it's handled entirely by Firebase Authentication.</li>
+        <li><strong>Orders are sent as a Messenger chat</strong> to the shop, not stored on our servers, and we don't collect payment details in the app.</li>
+        <li><strong>Your theme and favorites stay on your phone</strong> — they're never uploaded anywhere.</li>
+        <li>We don't sell your data, and we don't run ads or third-party analytics in the app.</li>
+      </ul>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Table of contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#who-we-are"><span class="num">1</span>Who we are</a></li>
+      <li><a href="#what-we-collect"><span class="num">2</span>Information we collect</a></li>
+      <li><a href="#how-ordering-works"><span class="num">3</span>How ordering works</a></li>
+      <li><a href="#how-we-use-it"><span class="num">4</span>How we use your information</a></li>
+      <li><a href="#third-parties"><span class="num">5</span>Third-party services</a></li>
+      <li><a href="#storage-security"><span class="num">6</span>Storage &amp; security</a></li>
+      <li><a href="#your-choices"><span class="num">7</span>Your choices &amp; rights</a></li>
+      <li><a href="#children"><span class="num">8</span>Children's privacy</a></li>
+      <li><a href="#changes"><span class="num">9</span>Changes to this policy</a></li>
+      <li><a href="#contact"><span class="num">10</span>Contact us</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="who-we-are">
+      <h2 class="section-title"><span class="num">01</span>Who we are</h2>
+      <p>A&amp;Y Sippop is a tea &amp; coffee shop located at Rizal St., Bgy. Basud (near Sto. Niño High School). The Aysippop Store app is how our customers browse the menu, build an order, and send it to us to prepare — this policy covers what happens to your information when you use it.</p>
+    </section>
+
+    <section id="what-we-collect">
+      <h2 class="section-title"><span class="num">02</span>Information we collect</h2>
+      <p>We keep this to what the app actually needs to run:</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>What</th>
+              <th>Examples</th>
+              <th>When it's collected</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="label">Account details</td>
+              <td>Email address; display name &amp; profile photo (only if you sign in with Google or Facebook)</td>
+              <td class="soft">When you register or sign in</td>
+            </tr>
+            <tr>
+              <td class="label">Password</td>
+              <td>Encrypted and managed entirely by Firebase Authentication — we never see or store it in readable form</td>
+              <td class="soft">When you register with email &amp; password</td>
+            </tr>
+            <tr>
+              <td class="label">Order details</td>
+              <td>Items, sizes, quantities, and total</td>
+              <td class="soft">When you check out — sent to us as a Messenger message, not stored on our servers</td>
+            </tr>
+            <tr>
+              <td class="label">App preferences</td>
+              <td>Theme (light/dark), favorite items</td>
+              <td class="soft">Saved only on your device — never leaves your phone</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="soft">We don't collect payment card numbers, precise location, or contacts through the app.</p>
+    </section>
+
+    <section id="how-ordering-works">
+      <h2 class="section-title"><span class="num">03</span>How ordering works</h2>
+      <p>Your cart lives only in the app's memory while you're using it — it clears when you close the app, and we don't keep an order history on any server. When you check out, the app formats your order as a text message and opens Facebook Messenger so you can send it directly to our shop's page. From that point, the conversation is between you and A&amp;Y Sippop on Messenger, governed by Meta's own privacy policy for the Messenger platform.</p>
+      <p>We don't process payment inside the app — payment is arranged with the shop directly, the same way it would be for a phone-in order.</p>
+    </section>
+
+    <section id="how-we-use-it">
+      <h2 class="section-title"><span class="num">04</span>How we use your information</h2>
+      <ul>
+        <li>To create and sign you into your account.</li>
+        <li>To let you place an order by handing it off to Messenger.</li>
+        <li>To keep the app working the way you left it (theme, favorites) on your own device.</li>
+        <li>To respond to you if you contact us for support.</li>
+      </ul>
+      <p>We do not sell your information, and we do not use it for advertising.</p>
+    </section>
+
+    <section id="third-parties">
+      <h2 class="section-title"><span class="num">05</span>Third-party services</h2>
+      <p>Signing in and checking out route through a small number of services that process data on our behalf:</p>
+      <h3 class="sub">Firebase Authentication (Google)</h3>
+      <p>Handles account creation, sign-in, and password storage. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</p>
+      <h3 class="sub">Google Sign-In</h3>
+      <p>If you choose "Continue with Google," Google shares your name, email, and profile photo with us to create your account.</p>
+      <h3 class="sub">Facebook Login &amp; Messenger (Meta)</h3>
+      <p>If you choose "Continue with Facebook," Meta shares your name, email, and profile photo with us. Checkout also opens Messenger to send your order. See <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener">Meta's Privacy Policy</a>.</p>
+    </section>
+
+    <section id="storage-security">
+      <h2 class="section-title"><span class="num">06</span>Storage &amp; security</h2>
+      <p>Account data is stored with Firebase Authentication on Google Cloud infrastructure and protected by their standard security practices. Preferences like theme and favorites are stored locally on your device using your phone's app storage and are never transmitted to us. Cart and order-in-progress data exist only in memory while the app is open.</p>
+    </section>
+
+    <section id="your-choices">
+      <h2 class="section-title"><span class="num">07</span>Your choices &amp; rights</h2>
+      <ul>
+        <li><strong>Access or correct your details</strong> — update your name or photo through whichever provider you signed in with (Google or Facebook), or contact us for anything tied to your account directly.</li>
+        <li><strong>Delete your account</strong> — message us (details below) and we'll delete your account record from Firebase Authentication.</li>
+        <li><strong>Clear local data</strong> — uninstalling the app removes everything stored on your device, including favorites and theme preference.</li>
+      </ul>
+      <p class="soft">If you're in the Philippines, these choices are also consistent with your rights under the Data Privacy Act of 2012 (RA 10173).</p>
+    </section>
+
+    <section id="children">
+      <h2 class="section-title"><span class="num">08</span>Children's privacy</h2>
+      <p>The app isn't directed at children under 13, and we don't knowingly collect information from them. If you believe a child has created an account, contact us and we'll remove it.</p>
+    </section>
+
+    <section id="changes">
+      <h2 class="section-title"><span class="num">09</span>Changes to this policy</h2>
+      <p>If how we handle your information changes, we'll update this page and revise the "Last updated" date at the top. Significant changes will be noted in the app.</p>
+    </section>
+
+    <section id="contact">
+      <h2 class="section-title"><span class="num">10</span>Contact us</h2>
+      <p>Questions about this policy or your data? Reach us here:</p>
+      <div class="contact-card">
+        <dl>
+          <dt>Shop</dt>
+          <dd>A&amp;Y Sippop — Rizal St., Bgy. Basud, near Sto. Niño High School</dd>
+          <dt>Facebook</dt>
+          <dd><a href="https://web.facebook.com/AYSIPPOP" target="_blank" rel="noopener">facebook.com/AYSIPPOP</a></dd>
+          <dt>WhatsApp</dt>
+          <dd><a href="https://wa.me/639358114619" target="_blank" rel="noopener">+63 935 811 4619</a></dd>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>This policy describes the Aysippop Store app as it currently works. It doesn't cover any other A&amp;Y Sippop channels (like in-store purchases) beyond what's described above.</p>
+  </footer>
+</div>

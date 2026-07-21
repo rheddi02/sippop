@@ -11,7 +11,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -60,7 +59,7 @@ const LoginScreen = () => {
   const insets = useSafeAreaInsets();
   const [errors, setErrors] = useState("");
 
-  const { login, loginWithGoogle, loading } = useUser();
+  const { login, loginWithGoogle, loginWithFacebook, loading } = useUser();
 
   const handleSignIn = async () => {
     try {
@@ -75,6 +74,16 @@ const LoginScreen = () => {
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
+      router.replace("/");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrors(message);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    try {
+      await loginWithFacebook();
       router.replace("/");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -132,7 +141,10 @@ const LoginScreen = () => {
             </View>
           </View>
 
-          <Pressable style={{ alignSelf: "flex-end", marginTop: 8 }}>
+          <Pressable
+            style={{ alignSelf: "flex-end", marginTop: 8 }}
+            onPress={() => router.push("/forgot-password")}
+          >
             <ThemedText>Forgot Password ?</ThemedText>
           </Pressable>
 
@@ -168,7 +180,7 @@ const LoginScreen = () => {
             icon="logo-facebook"
             color={theme.text}
             label="Continue with Facebook"
-            onPress={() => Alert.alert("Not yet implemented")}
+            onPress={handleFacebookSignIn}
           />
 
           <Spacer height={12} />

@@ -1,4 +1,4 @@
-import { Spacer } from "@/components/Spacer";
+import Spacer from "@/components/Spacer";
 import { ThemedButton } from "@/components/ThemedButton";
 import { ThemedCard } from "@/components/ThemedCard";
 import { ThemedText } from "@/components/ThemedText";

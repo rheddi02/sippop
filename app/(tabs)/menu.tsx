@@ -7,6 +7,7 @@ import {
   FlatList,
   RefreshControl,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -20,11 +21,18 @@ export default function MenuScreen() {
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredMenu = mockMenu.filter((item) => {
-    if (activeCategory === "all") return true;
-    if (activeCategory === "favorite") return isFavorite(item.id);
-    return item.category === activeCategory;
+    const matchesCategory =
+      activeCategory === "all" ||
+      (activeCategory === "favorite"
+        ? isFavorite(item.id)
+        : item.category === activeCategory);
+    const matchesSearch =
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
   const onRefresh = async () => {
@@ -65,6 +73,20 @@ export default function MenuScreen() {
           <Ionicons name="person-circle" size={32} color={theme.primary} />
           <ThemedText type="title">Hello, Guest.</ThemedText>
         </View>
+      </ThemedView>
+
+      {/* Search Bar */}
+      <ThemedView style={styles.searchContainer}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            { color: theme.text, backgroundColor: theme.card },
+          ]}
+          placeholder="Search menu..."
+          placeholderTextColor={theme.muted}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
       </ThemedView>
 
       {/* Category Tabs */}
@@ -186,6 +208,16 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: "space-around",
     marginBottom: -10,
+  },
+  searchContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  searchInput: {
+    height: 40,
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
   // checkoutButton: {
   //   position: "absolute",

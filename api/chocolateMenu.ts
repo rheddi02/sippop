@@ -45,6 +45,6 @@ export const ChocolateMenu = [
       "Rich chocolate milk with a hot, creamy texture. Perfect for satisfying your chocolate cravings.",
     image: require("@/assets/images/chocolate/hot-choco-milk.webp"),
     ...options,
-    sizes: [{ name: "8oz", price: 49, isAvailable: true }],
+    sizes: [{ name: "8oz", price: 65, isAvailable: true }],
   },
 ];

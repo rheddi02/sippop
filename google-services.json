@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "851430537285",
+    "project_id": "sippop-store-6e8f5",
+    "storage_bucket": "sippop-store-6e8f5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:851430537285:android:ea916091bf6c3ade308b2c",
+        "android_client_info": {
+          "package_name": "com.aysippop.store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "851430537285-gggnpo12l60mcphd5cd0lmccjlm1hqdc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aysippop.store",
+            "certificate_hash": "9747cd2e029cb0b82ca6d38d25eb3c3db8eb21c8"
+          }
+        },
+        {
+          "client_id": "851430537285-5uvlaklb33ur53pbj3c3bu1tsa2pu8g5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwH88yJxBoeTW9hv7LK1Du4ILqZV3Y8mM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "851430537285-5uvlaklb33ur53pbj3c3bu1tsa2pu8g5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
