@@ -1,23 +1,45 @@
+import { ThemedButton } from "@/components/ThemedButton";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import { useUser } from "@/hooks/useUser";
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { router } from "expo-router";
 import ThemedLoader from "./ThemedLoader";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+function DefaultLoggedOutNotice() {
+  return (
+    <ThemedView
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+      }}
+    >
+      <ThemedText style={{ fontSize: 16, marginBottom: 16, textAlign: "center" }}>
+        Log in to view this.
+      </ThemedText>
+      <ThemedButton
+        title="Go to Profile to log in"
+        onPress={() => router.push("/(tabs)/profile")}
+      />
+    </ThemedView>
+  );
+}
+
+const ProtectedRoute = ({
+  children,
+  fallback,
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}) => {
   const { user, isAuthChecked } = useUser();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthChecked) return;
-    if (!user) {
-      router.push("/login");
-    } else if (!user.emailVerified) {
-      router.push("/verify-email");
-    }
-  }, [user, isAuthChecked, router]);
-
-  if (!isAuthChecked || !user || !user.emailVerified) {
+  if (!isAuthChecked) {
     return <ThemedLoader />;
+  }
+  if (!user) {
+    return fallback ?? <DefaultLoggedOutNotice />;
   }
   return children;
 };
