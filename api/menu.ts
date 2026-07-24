@@ -10,6 +10,11 @@ interface ProductRow {
   is_active: boolean;
 }
 
+interface ProductIngredientRow {
+  product_id: string;
+  ingredient_name: string;
+}
+
 // POS category values are free-text Title Case and don't always match the
 // app's category ids one-for-one (e.g. "Hot" -> "hotdrinks") — normalize
 // explicitly rather than just lowercasing.
@@ -50,7 +55,10 @@ function sizeSortKey(size: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
-function toCatalogItems(rows: ProductRow[]): CatalogItem[] {
+function toCatalogItems(
+  rows: ProductRow[],
+  ingredientsByProduct: Map<string, string[]>
+): CatalogItem[] {
   const groups = new Map<
     string,
     { baseName: string; category: CategoryId; rows: { row: ProductRow; size: string | null }[] }
@@ -88,6 +96,12 @@ function toCatalogItems(rows: ProductRow[]): CatalogItem[] {
     // Use the smallest/first size's row as the group's stable id and image.
     const primary = group.rows[0].row;
 
+    // Each size variant is its own product row and may carry its own
+    // recipe, so union ingredient names across every row in the group.
+    const ingredientNames = Array.from(
+      new Set(group.rows.flatMap(({ row }) => ingredientsByProduct.get(row.id) ?? []))
+    );
+
     return {
       id: primary.id,
       name: group.baseName,
@@ -96,6 +110,7 @@ function toCatalogItems(rows: ProductRow[]): CatalogItem[] {
       image: primary.image_url ? { uri: primary.image_url } : null,
       category: group.category,
       sizes,
+      ingredientNames,
     };
   });
 }
@@ -107,14 +122,27 @@ export async function fetchMenu(forceRefresh = false): Promise<CatalogItem[]> {
     return cachedMenu;
   }
 
-  const { data, error } = await supabase
-    .from("products")
-    .select("id,name,price,category,image_url,is_active")
-    .eq("is_active", true);
+  const [productsResult, ingredientsResult] = await Promise.all([
+    supabase
+      .from("products")
+      .select("id,name,price,category,image_url,is_active")
+      .eq("is_active", true),
+    supabase.rpc("get_admin_product_ingredients"),
+  ]);
 
-  if (error) throw error;
+  if (productsResult.error) throw productsResult.error;
 
-  const menu = toCatalogItems(data as ProductRow[]);
+  // Ingredient names are a search-enrichment nice-to-have — don't fail the
+  // whole menu load if the RPC errors (e.g. an older backend without it yet).
+  const ingredientRows = (ingredientsResult.data as ProductIngredientRow[] | null) ?? [];
+  const ingredientsByProduct = new Map<string, string[]>();
+  for (const { product_id, ingredient_name } of ingredientRows) {
+    const names = ingredientsByProduct.get(product_id) ?? [];
+    names.push(ingredient_name);
+    ingredientsByProduct.set(product_id, names);
+  }
+
+  const menu = toCatalogItems(productsResult.data as ProductRow[], ingredientsByProduct);
   cachedMenu = menu;
   return menu;
 }

@@ -35,6 +35,10 @@ export interface CatalogItem {
   image: ImageSourcePropType | null;
   category: CategoryId;
   sizes: SizeOption[];
+  // Ingredient names from the recipe behind this item (unioned across all
+  // size-variant rows), so search can match e.g. "coffee" against "Oreo
+  // Latte" without it being in the product name.
+  ingredientNames: string[];
 }
 
 // Product type (used in menu, cart, orders)

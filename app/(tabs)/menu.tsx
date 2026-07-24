@@ -70,9 +70,11 @@ export default function MenuScreen() {
         (activeCategory === "favorite"
           ? isFavorite(item.id)
           : item.category === activeCategory);
+      const query = searchQuery.toLowerCase();
       const matchesSearch =
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+        item.name.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query) ||
+        item.ingredientNames.some((n) => n.toLowerCase().includes(query));
       return matchesCategory && matchesSearch;
     });
   }, [menu, activeCategory, searchQuery, isFavorite]);
