@@ -1,25 +1,33 @@
 import { useThemeColors } from "@/context";
+import { SizeOption } from "@/utils/types";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { formatPesoForPrice } from "../utils/amountHelper";
 import { ThemedText } from "./ThemedText";
 
 interface MenuItemPriceProps {
-  sizes: { name: string; price: number }[];
+  sizes: Pick<SizeOption, "name" | "price" | "isAvailable">[];
 }
 
 export default function MenuItemPrice({ sizes }: MenuItemPriceProps) {
   const { theme } = useThemeColors();
 
+  const available = sizes.filter((s) => s.isAvailable !== false);
+  const prices = (available.length ? available : sizes).map((s) => s.price);
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  const isRange = min !== max;
+
   return (
     <View style={styles.container}>
-      <ThemedText key={sizes[0].name} style={[styles.price]}>
+      <ThemedText style={[styles.price]}>
+        {isRange && (
+          <Text style={{ color: theme.muted, fontSize: 12 }}>from </Text>
+        )}
         <Text style={{ color: theme.secondary }}>
-          {formatPesoForPrice(sizes[0].price)}
-        </Text>
-        &nbsp;
-        <Text style={{ color: theme.muted, fontSize: 12 }}>
-          {sizes[0].name}
+          {isRange
+            ? `${formatPesoForPrice(min)}–${formatPesoForPrice(max)}`
+            : formatPesoForPrice(min)}
         </Text>
       </ThemedText>
     </View>

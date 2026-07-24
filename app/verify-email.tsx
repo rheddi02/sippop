@@ -13,8 +13,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 const RESEND_COOLDOWN = 60;
 
 export default function VerifyEmailScreen() {
-  const { user, isAuthChecked, sendVerificationEmail, refreshUser, logout } =
-    useUser();
+  const {
+    user,
+    pendingEmail,
+    isAuthChecked,
+    sendVerificationEmail,
+    refreshUser,
+    logout,
+  } = useUser();
   const { theme } = useThemeColors();
   const insets = useSafeAreaInsets();
 
@@ -24,14 +30,18 @@ export default function VerifyEmailScreen() {
   const [sendError, setSendError] = useState("");
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Supabase only grants a session once an account is confirmed (or
+  // confirmation is disabled project-wide), so a present `user` means
+  // there's nothing left to verify. With neither a session nor a pending
+  // registration, there's nothing to show here either.
   useEffect(() => {
     if (!isAuthChecked) return;
-    if (!user) {
-      router.replace("/login");
-    } else if (user.emailVerified) {
+    if (user) {
       router.replace("/");
+    } else if (!pendingEmail) {
+      router.replace("/login");
     }
-  }, [user, isAuthChecked]);
+  }, [user, pendingEmail, isAuthChecked]);
 
   useEffect(() => {
     return () => {
@@ -98,7 +108,7 @@ export default function VerifyEmailScreen() {
         We sent a verification link to
       </ThemedText>
       <ThemedText style={[styles.email, { color: theme.tint }]}>
-        {user?.email}
+        {pendingEmail ?? user?.email}
       </ThemedText>
 
       <Spacer height={32} />

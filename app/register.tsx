@@ -56,12 +56,12 @@ const RegisterScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState("");
 
-  const { register, sendVerificationEmail, loginWithGoogle, loginWithFacebook } =
-    useUser();
+  const { register, loginWithGoogle, loginWithFacebook } = useUser();
   const handleRegister = async () => {
     try {
+      // Supabase's signUp() already sends the confirmation email itself —
+      // no separate "send" call needed right after registering.
       await register(email, password);
-      await sendVerificationEmail();
       router.replace("/verify-email");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);

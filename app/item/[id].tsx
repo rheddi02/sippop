@@ -1,24 +1,28 @@
-import { mockMenu } from "@/api/mockData";
+import { fetchMenu } from "@/api/menu";
 import FavoriteButton from "@/components/FavoriteButton";
+import MenuItemPlaceholder from "@/components/MenuItemPlaceholder";
 import { ThemedCard } from "@/components/ThemedCard";
+import ThemedLoader from "@/components/ThemedLoader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useCart } from "@/context/CartContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useThemeColors } from "@/context/ThemeContext";
+import { toCartItem } from "@/utils/cart";
+import { CatalogItem, SizeOption } from "@/utils/types";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useRef, useState } from "react";
-import {
-  Animated,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, {
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-// const { width } = Dimensions.get("window");
 
 export default function ItemView() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,31 +31,97 @@ export default function ItemView() {
   const { isFavorite, toggleFavorite } = useFavorites();
   const insets = useSafeAreaInsets();
 
-  const item = mockMenu.find((item) => item.id === id)!;
-
-  const [selectedSize, setSelectedSize] = useState(
-    item.sizes.find((size) => size.isAvailable) || item.sizes[0],
+  const [menu, setMenu] = useState<CatalogItem[] | null>(null);
+  const [selectedSize, setSelectedSize] = useState<SizeOption | undefined>(
+    undefined,
   );
   const [quantity, setQuantity] = useState(1);
 
-  // Parallax animation
-  const scrollY = useRef(new Animated.Value(0)).current;
+  // Parallax + entrance animation
+  const scrollY = useSharedValue(0);
+  const heroProgress = useSharedValue(0);
   const imageHeight = 300;
   const parallaxFactor = 0.5;
 
-  const basePrice = selectedSize.price;
+  const item = menu?.find((i) => i.id === id);
 
+  useEffect(() => {
+    fetchMenu()
+      .then(setMenu)
+      .catch(() => setMenu([]));
+  }, []);
+
+  useEffect(() => {
+    if (item && !selectedSize) {
+      setSelectedSize(item.sizes.find((size) => size.isAvailable) || item.sizes[0]);
+    }
+  }, [item, selectedSize]);
+
+  React.useEffect(() => {
+    heroProgress.value = withDelay(50, withSpring(1, { damping: 16 }));
+  }, [heroProgress]);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const heroAnimatedStyle = useAnimatedStyle(() => {
+    const parallaxTranslateY = interpolate(
+      scrollY.value,
+      [-imageHeight, 0, imageHeight],
+      [-imageHeight * parallaxFactor, 0, imageHeight * parallaxFactor],
+      "clamp",
+    );
+    const parallaxScale = interpolate(
+      scrollY.value,
+      [-imageHeight, 0, imageHeight],
+      [1.2, 1, 0.8],
+      "clamp",
+    );
+    const entranceScale = interpolate(heroProgress.value, [0, 1], [0.9, 1]);
+    const entranceOpacity = heroProgress.value;
+
+    return {
+      opacity: entranceOpacity,
+      transform: [
+        { translateY: parallaxTranslateY },
+        { scale: parallaxScale * entranceScale },
+      ],
+    };
+  });
+
+  if (menu === null) {
+    return (
+      <ThemedView style={[styles.container, styles.notFoundContainer]}>
+        <ThemedLoader />
+      </ThemedView>
+    );
+  }
+
+  if (!item || !selectedSize) {
+    return (
+      <ThemedView style={[styles.container, styles.notFoundContainer]}>
+        <Ionicons name="alert-circle-outline" size={48} color={theme.muted} />
+        <ThemedText type="subtitle" style={{ marginTop: 12 }}>
+          Item not found
+        </ThemedText>
+        <TouchableOpacity
+          style={[styles.backToMenuButton, { backgroundColor: theme.primary }]}
+          onPress={() => router.back()}
+        >
+          <ThemedText style={{ color: theme.background }}>Go back</ThemedText>
+        </TouchableOpacity>
+      </ThemedView>
+    );
+  }
+
+  const basePrice = selectedSize.price;
   const totalPrice = basePrice * quantity;
 
   const handleAddToCart = () => {
-    addToCart({
-      id: `${item.id}`,
-      name: `${item.name}`,
-      quantity,
-      price: basePrice,
-      image: item.image,
-      size: selectedSize.name,
-    });
+    addToCart(toCartItem(item, selectedSize, quantity));
     router.back();
   };
 
@@ -87,45 +157,17 @@ export default function ItemView() {
         />
       </ThemedView>
 
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false },
-        )}
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
         {/* Beverage Image with Parallax */}
         <ThemedView style={styles.imageContainer}>
-          <Animated.Image
-            source={item.image}
-            style={[
-              styles.image,
-              {
-                transform: [
-                  {
-                    translateY: scrollY.interpolate({
-                      inputRange: [-imageHeight, 0, imageHeight],
-                      outputRange: [
-                        -imageHeight * parallaxFactor,
-                        0,
-                        imageHeight * parallaxFactor,
-                      ],
-                      extrapolate: "clamp",
-                    }),
-                  },
-                  {
-                    scale: scrollY.interpolate({
-                      inputRange: [-imageHeight, 0, imageHeight],
-                      outputRange: [1.2, 1, 0.8],
-                      extrapolate: "clamp",
-                    }),
-                  },
-                ],
-              },
-            ]}
-          />
+          <Animated.View style={heroAnimatedStyle}>
+            <MenuItemPlaceholder name={item.name} size={220} borderRadius={16} />
+          </Animated.View>
         </ThemedView>
 
         {/* Item Info */}
@@ -133,9 +175,11 @@ export default function ItemView() {
           <ThemedText style={[styles.itemName, { color: theme.text }]}>
             {item.name}
           </ThemedText>
-          <ThemedText style={[styles.itemDescription, { color: theme.muted }]}>
-            {item.description}
-          </ThemedText>
+          {!!item.description && (
+            <ThemedText style={[styles.itemDescription, { color: theme.muted }]}>
+              {item.description}
+            </ThemedText>
+          )}
         </ThemedCard>
 
         {/* Size Selection */}
@@ -151,8 +195,6 @@ export default function ItemView() {
                 key={size.name}
                 style={[
                   styles.sizeOption,
-                  selectedSize.name === size.name && styles.selectedSize,
-                  !size.isAvailable && styles.disabledSize,
                   {
                     borderColor:
                       selectedSize.name === size.name
@@ -167,10 +209,25 @@ export default function ItemView() {
                           ? theme.muted + "20"
                           : "transparent",
                   },
+                  !size.isAvailable && styles.disabledSize,
                 ]}
                 onPress={() => size.isAvailable && setSelectedSize(size)}
                 disabled={!size.isAvailable}
               >
+                {size.temperature && (
+                  <Ionicons
+                    name={size.temperature === "hot" ? "flame" : "snow"}
+                    size={14}
+                    color={
+                      selectedSize.name === size.name
+                        ? theme.background
+                        : !size.isAvailable
+                          ? theme.muted
+                          : theme.muted
+                    }
+                    style={styles.tempIcon}
+                  />
+                )}
                 <ThemedText
                   style={[
                     styles.sizeText,
@@ -185,6 +242,7 @@ export default function ItemView() {
                   ]}
                 >
                   {size.name}
+                  {size.temperature ? ` · ${size.temperature === "hot" ? "Hot" : "Iced"}` : ""}
                 </ThemedText>
                 <ThemedText
                   style={[
@@ -210,9 +268,6 @@ export default function ItemView() {
         <ThemedView
           style={[styles.sectionContainer, { backgroundColor: theme.card }]}
         >
-          {/* <ThemedText style={[styles.sectionTitle, { color: theme.text }]}>
-            Quantity
-          </ThemedText> */}
           <ThemedView
             style={[
               styles.quantityContainer,
@@ -244,7 +299,7 @@ export default function ItemView() {
             </TouchableOpacity>
           </ThemedView>
         </ThemedView>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Bottom Bar */}
       <ThemedView
@@ -280,6 +335,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  notFoundContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backToMenuButton: {
+    marginTop: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -291,19 +356,6 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-  favoriteButton: {
-    padding: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
   scrollView: {
     flex: 1,
   },
@@ -313,14 +365,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 10,
     overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: 500,
-    resizeMode: "contain",
-  },
-  beverageImage: {
-    fontSize: 120,
   },
   infoContainer: {
     margin: 16,
@@ -352,40 +396,31 @@ const styles = StyleSheet.create({
   sizeContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 8,
   },
   sizeOption: {
     flex: 1,
-    padding: 5,
-    marginHorizontal: 4,
+    minWidth: "45%",
+    padding: 8,
     borderRadius: 8,
     borderWidth: 2,
     alignItems: "center",
   },
-  selectedSize: {
-    // backgroundColor handled in style prop
-  },
   disabledSize: {
     opacity: 0.6,
   },
+  tempIcon: {
+    marginBottom: 2,
+  },
   sizeText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
     marginBottom: 4,
-    letterSpacing: 5,
   },
   sizePrice: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "800",
-    letterSpacing: 3,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
   },
   quantityContainer: {
     flexDirection: "row",
@@ -434,10 +469,5 @@ const styles = StyleSheet.create({
   addToCartText: {
     fontSize: 18,
     fontWeight: "600",
-  },
-  errorText: {
-    fontSize: 18,
-    textAlign: "center",
-    marginTop: 50,
   },
 });

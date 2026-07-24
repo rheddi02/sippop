@@ -43,19 +43,7 @@
         }
       ],
       "expo-secure-store",
-      "@react-native-google-signin/google-signin",
-      [
-        "react-native-fbsdk-next",
-        {
-          "appID": "1702944317602322",
-          "clientToken": "7623b5a49bc7a4c08ba577b102e74095",
-          "displayName": "Aysippop Store",
-          "scheme": "fb1702944317602322",
-          "advertiserIDCollectionEnabled": false,
-          "autoLogAppEventsEnabled": false,
-          "isAutoInitEnabled": true
-        }
-      ]
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true,

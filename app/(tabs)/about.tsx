@@ -2,20 +2,8 @@ import { ExternalLink } from "@/components/external-link";
 import Spacer from "@/components/Spacer";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useRouter } from "expo-router";
-import { useAuth } from "../../context/AuthContext";
-import { useThemeColors } from "../../context/ThemeContext";
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
-  const { isDark, toggleTheme, isSystemTheme, resetToSystemTheme, forceSystemThemeDetection } = useThemeColors();
-  const router = useRouter();
-
-  const handleLogout = () => {
-    logout();
-    router.replace("/");
-  };
-
   return (
     <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
       <ThemedText type="title">A&Y Sippop</ThemedText>

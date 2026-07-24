@@ -41,7 +41,12 @@ function AppContent() {
   return (
     <>
       <StatusBar style={isDark ? "light" : "dark"} />
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="item/[id]"
+          options={{ animation: "fade_from_bottom", animationDuration: 220 }}
+        />
+      </Stack>
     </>
   );
 }

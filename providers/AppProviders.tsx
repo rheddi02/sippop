@@ -1,10 +1,8 @@
-import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { OrdersProvider } from "@/context/OrdersContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { UserProvider } from "@/context/UserContext";
-import { WalletProvider } from "@/context/WalletContext";
 import React, { ReactNode } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -13,15 +11,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <SafeAreaProvider>
       <ThemeProvider>
         <UserProvider>
-          <AuthProvider>
-            <WalletProvider>
-              <CartProvider>
-                <OrdersProvider>
-                  <FavoritesProvider>{children}</FavoritesProvider>
-                </OrdersProvider>
-              </CartProvider>
-            </WalletProvider>
-          </AuthProvider>
+          <CartProvider>
+            <OrdersProvider>
+              <FavoritesProvider>{children}</FavoritesProvider>
+            </OrdersProvider>
+          </CartProvider>
         </UserProvider>
       </ThemeProvider>
     </SafeAreaProvider>

@@ -5,7 +5,7 @@ import { Redirect } from "expo-router";
 import "react-native-url-polyfill/auto";
 
 export default function IndexScreen() {
-  const { user, isAuthChecked } = useUser();
+  const { user, pendingEmail, isAuthChecked } = useUser();
 
   // Show loading while checking authentication
   if (!isAuthChecked) {
@@ -18,12 +18,13 @@ export default function IndexScreen() {
     );
   }
 
-  // Redirect based on authentication and verification status
-  if (user && user.emailVerified) {
+  // Supabase only ever grants a session to a confirmed (or confirmation-not-
+  // required) account, so a present `user` is always already verified.
+  if (user) {
     return <Redirect href="/(tabs)/menu" />;
-  } else if (user && !user.emailVerified) {
+  } else if (pendingEmail) {
     return <Redirect href="/verify-email" />;
   } else {
-    return <Redirect href="/login" />;
+    return <Redirect href="/(tabs)/menu" />;
   }
 }

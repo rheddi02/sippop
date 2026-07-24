@@ -1,36 +1,47 @@
-import React, { createContext, useState, ReactNode, useContext } from "react";
-import { Order, CartItem } from "@/utils/types";
+import { fetchOrders, placeOrder as placeOrderApi } from "@/api/orders";
+import { CartItem, Order } from "@/utils/types";
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 interface OrdersContextType {
   orders: Order[];
-  placeOrder: (items: CartItem[], total: number) => void;
-  updateOrderStatus: (id: string, status: Order["status"]) => void;
+  loading: boolean;
+  placeOrder: (items: CartItem[], useCredit?: boolean) => Promise<Order>;
+  refresh: () => Promise<void>;
 }
 
 export const OrdersContext = createContext<OrdersContextType | null>(null);
 
 export function OrdersProvider({ children }: { children: ReactNode }) {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const placeOrder = (items: CartItem[], total: number) => {
-    const newOrder: Order = {
-      id: Date.now().toString(),
-      items,
-      total,
-      status: "pending",
-      createdAt: new Date(),
-    };
-    setOrders((prev) => [...prev, newOrder]);
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      setOrders(await fetchOrders());
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateOrderStatus = (id: string, status: Order["status"]) => {
-    setOrders((prev) =>
-      prev.map((order) => (order.id === id ? { ...order, status } : order))
-    );
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  const placeOrder = async (items: CartItem[], useCredit = false) => {
+    const order = await placeOrderApi(items, useCredit);
+    setOrders((prev) => [order, ...prev]);
+    return order;
   };
 
   return (
-    <OrdersContext.Provider value={{ orders, placeOrder, updateOrderStatus }}>
+    <OrdersContext.Provider value={{ orders, loading, placeOrder, refresh }}>
       {children}
     </OrdersContext.Provider>
   );
