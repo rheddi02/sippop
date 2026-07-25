@@ -7,14 +7,14 @@ import { Profile } from "@/utils/types";
 const DEFAULT_PROFILE: Profile = {
   points: 0,
   creditBalance: 0,
-  creditLimit: 1000,
+  creditLimit: 0,
 };
 
-export async function fetchProfile(): Promise<Profile> {
+export async function fetchProfile(): Promise<Profile | null> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return DEFAULT_PROFILE;
+  if (!user) return null;
 
   const { data, error } = await supabase
     .from("customers")
