@@ -1,10 +1,12 @@
 import { LoginForm } from "@/components/LoginForm";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ScreenHeader from "@/components/ScreenHeader";
 import Spacer from "@/components/Spacer";
 import { ThemedButton } from "@/components/ThemedButton";
 import { ThemedCard } from "@/components/ThemedCard";
 import { ThemedText } from "@/components/ThemedText";
 import ThemedTextInput from "@/components/ThemedTextInput";
+import { ThemedView } from "@/components/ThemedView";
 import { useThemeColors } from "@/context";
 import { useProfile } from "@/hooks/useProfile";
 import { useUser } from "@/hooks/useUser";
@@ -99,185 +101,193 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ProtectedRoute
-      fallback={
-        <LoginForm subtitle="Log in to view your points, credit, and account settings." />
-      }
-    >
-      <ScrollView
-        style={{ flex: 1, backgroundColor: theme.background }}
-        contentContainerStyle={styles.container}
+    <ThemedView style={{ flex: 1 }}>
+      <ScreenHeader title="Profile" />
+      <ProtectedRoute
+        fallback={
+          <LoginForm subtitle="Log in to view your loyalty points, credit, and account settings." />
+        }
       >
-        <ThemedText type="title">Profile</ThemedText>
-        <ThemedText type="subtitle" style={styles.email}>
-          {user?.email || "Guest"}
-        </ThemedText>
+        <ScrollView
+          style={{ flex: 1, backgroundColor: theme.background }}
+          contentContainerStyle={styles.container}
+        >
+          <ThemedText type="subtitle" style={styles.email}>
+            {user?.email || "Guest"}
+          </ThemedText>
 
-        {!isEmailVerified && (
+          {!isEmailVerified && (
+            <ThemedCard style={styles.card}>
+              <ThemedText type="caption" style={{ color: theme.danger }}>
+                Email not verified
+              </ThemedText>
+              <Spacer height={8} />
+              {resendState === "sent" ? (
+                <ThemedText type="caption" style={{ color: theme.muted }}>
+                  Verification email sent — check your inbox.
+                </ThemedText>
+              ) : (
+                <ThemedButton
+                  title="Resend verification email"
+                  variant="outline"
+                  size="sm"
+                  loading={resendState === "sending"}
+                  onPress={handleResend}
+                />
+              )}
+              {resendState === "error" && (
+                <>
+                  <Spacer height={8} />
+                  <ThemedText type="caption" style={{ color: theme.danger }}>
+                    {resendError}
+                  </ThemedText>
+                </>
+              )}
+            </ThemedCard>
+          )}
+
           <ThemedCard style={styles.card}>
-            <ThemedText type="caption" style={{ color: theme.danger }}>
-              Email not verified
-            </ThemedText>
-            <Spacer height={8} />
-            {resendState === "sent" ? (
+            <ThemedText type="defaultSemiBold">Rewards</ThemedText>
+            <Spacer height={10} />
+            {profileLoading && !profile ? (
               <ThemedText type="caption" style={{ color: theme.muted }}>
-                Verification email sent — check your inbox.
+                Loading...
               </ThemedText>
             ) : (
-              <ThemedButton
-                title="Resend verification email"
-                variant="outline"
-                size="sm"
-                loading={resendState === "sending"}
-                onPress={handleResend}
-              />
-            )}
-            {resendState === "error" && (
               <>
-                <Spacer height={8} />
-                <ThemedText type="caption" style={{ color: theme.danger }}>
-                  {resendError}
-                </ThemedText>
+                <View style={styles.row}>
+                  <ThemedText>Loyalty Points</ThemedText>
+                  <ThemedText type="price">
+                    {profile?.points ?? 0} pts
+                  </ThemedText>
+                </View>
+                <Spacer height={6} />
+                <View style={styles.row}>
+                  <ThemedText>Store Credit</ThemedText>
+                  <ThemedText type="price">
+                    {formatPesoForCart(profile?.creditBalance ?? 0)} /{" "}
+                    {formatPesoForCart(profile?.creditLimit ?? 0)}
+                  </ThemedText>
+                </View>
               </>
             )}
           </ThemedCard>
-        )}
 
-        <ThemedCard style={styles.card}>
-          <ThemedText type="defaultSemiBold">Rewards</ThemedText>
-          <Spacer height={10} />
-          {profileLoading && !profile ? (
-            <ThemedText type="caption" style={{ color: theme.muted }}>
-              Loading...
-            </ThemedText>
-          ) : (
-            <>
-              <View style={styles.row}>
-                <ThemedText>Points</ThemedText>
-                <ThemedText type="price">{profile?.points ?? 0} pts</ThemedText>
-              </View>
-              <Spacer height={6} />
-              <View style={styles.row}>
-                <ThemedText>Store Credit</ThemedText>
-                <ThemedText type="price">
-                  {formatPesoForCart(profile?.creditBalance ?? 0)} /{" "}
-                  {formatPesoForCart(profile?.creditLimit ?? 0)}
-                </ThemedText>
-              </View>
-            </>
-          )}
-        </ThemedCard>
+          <ThemedCard style={styles.card}>
+            <ThemedText type="defaultSemiBold">Password</ThemedText>
+            <Spacer height={10} />
+            {!canChangePassword ? (
+              <ThemedText type="caption" style={{ color: theme.muted }}>
+                You signed in with{" "}
+                {user?.app_metadata?.provider === "google"
+                  ? "Google"
+                  : "a social account"}{" "}
+                — there&apos;s no password to change.
+              </ThemedText>
+            ) : !showPasswordForm ? (
+              <ThemedButton
+                title="Change Password"
+                variant="outline"
+                onPress={() => setShowPasswordForm(true)}
+              />
+            ) : (
+              <>
+                <ThemedTextInput
+                  placeholder="Current password"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  value={currentPassword}
+                  onChangeText={setCurrentPassword}
+                />
+                <Spacer height={12} />
+                <ThemedTextInput
+                  placeholder="New password"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                />
+                <Spacer height={12} />
+                <ThemedTextInput
+                  placeholder="Confirm new password"
+                  secureTextEntry
+                  autoCapitalize="none"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
 
-        <ThemedCard style={styles.card}>
-          <ThemedText type="defaultSemiBold">Password</ThemedText>
-          <Spacer height={10} />
-          {!canChangePassword ? (
-            <ThemedText type="caption" style={{ color: theme.muted }}>
-              You signed in with{" "}
-              {user?.app_metadata?.provider === "google" ? "Google" : "a social account"} —
-              there&apos;s no password to change.
-            </ThemedText>
-          ) : !showPasswordForm ? (
-            <ThemedButton
-              title="Change Password"
-              variant="outline"
-              onPress={() => setShowPasswordForm(true)}
-            />
-          ) : (
-            <>
-              <ThemedTextInput
-                placeholder="Current password"
-                secureTextEntry
-                autoCapitalize="none"
-                value={currentPassword}
-                onChangeText={setCurrentPassword}
-              />
-              <Spacer height={12} />
-              <ThemedTextInput
-                placeholder="New password"
-                secureTextEntry
-                autoCapitalize="none"
-                value={newPassword}
-                onChangeText={setNewPassword}
-              />
-              <Spacer height={12} />
-              <ThemedTextInput
-                placeholder="Confirm new password"
-                secureTextEntry
-                autoCapitalize="none"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-              />
+                {passwordError ? (
+                  <>
+                    <Spacer height={12} />
+                    <ThemedCard
+                      style={{ backgroundColor: "#d1001f", padding: 12 }}
+                    >
+                      <ThemedText style={{ color: "#fff9f9" }}>
+                        {passwordError}
+                      </ThemedText>
+                    </ThemedCard>
+                  </>
+                ) : null}
 
-              {passwordError ? (
-                <>
-                  <Spacer height={12} />
-                  <ThemedCard style={{ backgroundColor: "#d1001f", padding: 12 }}>
-                    <ThemedText style={{ color: "#fff9f9" }}>
-                      {passwordError}
+                {passwordSuccess ? (
+                  <>
+                    <Spacer height={12} />
+                    <ThemedText style={{ color: theme.primary }}>
+                      Password updated.
                     </ThemedText>
-                  </ThemedCard>
-                </>
-              ) : null}
+                  </>
+                ) : null}
 
-              {passwordSuccess ? (
-                <>
-                  <Spacer height={12} />
-                  <ThemedText style={{ color: theme.primary }}>
-                    Password updated.
-                  </ThemedText>
-                </>
-              ) : null}
+                <Spacer height={12} />
+                <ThemedButton
+                  title="Update Password"
+                  loading={passwordSubmitting}
+                  onPress={handleChangePassword}
+                />
+                <ThemedButton
+                  title="Cancel"
+                  variant="text"
+                  onPress={() => {
+                    setShowPasswordForm(false);
+                    resetPasswordForm();
+                  }}
+                />
+              </>
+            )}
+          </ThemedCard>
 
-              <Spacer height={12} />
+          <ThemedCard style={styles.card}>
+            <ThemedText type="defaultSemiBold">Theme</ThemedText>
+            <ThemedText type="caption" style={{ color: theme.muted }}>
+              Current: {isDark ? "Dark" : "Light"}{" "}
+              {isSystemTheme ? "(System)" : "(Manual)"}
+            </ThemedText>
+            <Spacer height={10} />
+            <ThemedButton
+              title={isDark ? "Switch to Light" : "Switch to Dark"}
+              variant="outline"
+              onPress={toggleTheme}
+            />
+            {!isSystemTheme && (
               <ThemedButton
-                title="Update Password"
-                loading={passwordSubmitting}
-                onPress={handleChangePassword}
-              />
-              <ThemedButton
-                title="Cancel"
+                title="Reset to System Theme"
                 variant="text"
-                onPress={() => {
-                  setShowPasswordForm(false);
-                  resetPasswordForm();
-                }}
+                onPress={resetToSystemTheme}
               />
-            </>
-          )}
-        </ThemedCard>
+            )}
+          </ThemedCard>
 
-        <ThemedCard style={styles.card}>
-          <ThemedText type="defaultSemiBold">Theme</ThemedText>
-          <ThemedText type="caption" style={{ color: theme.muted }}>
-            Current: {isDark ? "Dark" : "Light"}{" "}
-            {isSystemTheme ? "(System)" : "(Manual)"}
-          </ThemedText>
           <Spacer height={10} />
           <ThemedButton
-            title={isDark ? "Switch to Light" : "Switch to Dark"}
-            variant="outline"
-            onPress={toggleTheme}
+            title="Logout"
+            variant="danger"
+            fullWidth
+            onPress={handleLogout}
           />
-          {!isSystemTheme && (
-            <ThemedButton
-              title="Reset to System Theme"
-              variant="text"
-              onPress={resetToSystemTheme}
-            />
-          )}
-        </ThemedCard>
-
-        <Spacer height={10} />
-        <ThemedButton
-          title="Logout"
-          variant="danger"
-          fullWidth
-          onPress={handleLogout}
-        />
-        <Spacer height={20} />
-      </ScrollView>
-    </ProtectedRoute>
+          <Spacer height={20} />
+        </ScrollView>
+      </ProtectedRoute>
+    </ThemedView>
   );
 }
 

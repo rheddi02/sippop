@@ -4,7 +4,13 @@ import { useUser } from "@/hooks/useUser";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
-import { Modal, Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
+import {
+  Modal,
+  Pressable,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -16,7 +22,6 @@ import { ThemedText } from "./ThemedText";
 interface MenuDrawerProps {
   visible: boolean;
   onClose: () => void;
-  onSelectFavorites?: () => void;
 }
 
 interface DrawerLink {
@@ -25,9 +30,9 @@ interface DrawerLink {
   onPress: () => void;
 }
 
-export default function MenuDrawer({ visible, onClose, onSelectFavorites }: MenuDrawerProps) {
+export default function MenuDrawer({ visible, onClose }: MenuDrawerProps) {
   const { theme, isDark, toggleTheme } = useThemeColors();
-  const { user, logout } = useUser();
+  const { user } = useUser();
   const { favorites } = useFavorites();
   const { width: screenWidth } = useWindowDimensions();
   const panelWidth = Math.min(screenWidth * 0.78, 320);
@@ -47,21 +52,45 @@ export default function MenuDrawer({ visible, onClose, onSelectFavorites }: Menu
   };
 
   const links: DrawerLink[] = [
-    { label: "Profile", icon: "person-outline", onPress: () => navigateTo("/(tabs)/profile") },
-    { label: "Orders", icon: "receipt-outline", onPress: () => navigateTo("/(tabs)/orders") },
+    {
+      label: "Menu",
+      icon: "restaurant-outline",
+      onPress: () => navigateTo("/(tabs)/menu"),
+    },
+    {
+      label: "Cart",
+      icon: "cart-outline",
+      onPress: () => navigateTo("/(tabs)/cart"),
+    },
+    {
+      label: "Profile",
+      icon: "person-outline",
+      onPress: () => navigateTo("/(tabs)/profile"),
+    },
+    {
+      label: "Orders",
+      icon: "receipt-outline",
+      onPress: () => navigateTo("/(tabs)/orders"),
+    },
     {
       label: `Favorites (${favorites.length})`,
       icon: "heart-outline",
-      onPress: () => {
-        onClose();
-        onSelectFavorites?.();
-      },
+      onPress: () => navigateTo("/(tabs)/menu?category=favorite"),
     },
-    { label: "About", icon: "location-outline", onPress: () => navigateTo("/(tabs)/about") },
+    {
+      label: "About",
+      icon: "location-outline",
+      onPress: () => navigateTo("/(tabs)/about"),
+    },
   ];
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+    >
       <Pressable style={styles.backdrop} onPress={onClose} />
       <Animated.View
         style={[
@@ -74,7 +103,9 @@ export default function MenuDrawer({ visible, onClose, onSelectFavorites }: Menu
           <Ionicons name="person-circle" size={36} color={theme.primary} />
           <ThemedText type="subtitle" style={styles.headerText}>
             {user
-              ? (user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.email)
+              ? (user.user_metadata?.full_name ??
+                user.user_metadata?.name ??
+                user.email)
               : "Guest"}
           </ThemedText>
         </View>
@@ -89,33 +120,15 @@ export default function MenuDrawer({ visible, onClose, onSelectFavorites }: Menu
         ))}
 
         <Pressable style={styles.row} onPress={toggleTheme}>
-          <Ionicons name={isDark ? "moon" : "sunny-outline"} size={20} color={theme.text} />
+          <Ionicons
+            name={isDark ? "moon" : "sunny-outline"}
+            size={20}
+            color={theme.text}
+          />
           <ThemedText type="body" style={styles.rowText}>
             {isDark ? "Dark mode" : "Light mode"}
           </ThemedText>
         </Pressable>
-
-        {user ? (
-          <Pressable
-            style={styles.row}
-            onPress={() => {
-              onClose();
-              logout();
-            }}
-          >
-            <Ionicons name="log-out-outline" size={20} color={theme.danger} />
-            <ThemedText type="body" style={[styles.rowText, { color: theme.danger }]}>
-              Log out
-            </ThemedText>
-          </Pressable>
-        ) : (
-          <Pressable style={styles.row} onPress={() => navigateTo("/login")}>
-            <Ionicons name="log-in-outline" size={20} color={theme.primary} />
-            <ThemedText type="body" style={[styles.rowText, { color: theme.primary }]}>
-              Log in
-            </ThemedText>
-          </Pressable>
-        )}
       </Animated.View>
     </Modal>
   );

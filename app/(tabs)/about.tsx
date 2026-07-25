@@ -1,3 +1,4 @@
+import ScreenHeader from "@/components/ScreenHeader";
 import { ExternalLink } from "@/components/external-link";
 import Spacer from "@/components/Spacer";
 import { ThemedText } from "@/components/ThemedText";
@@ -5,45 +6,49 @@ import { ThemedView } from "@/components/ThemedView";
 
 export default function ProfileScreen() {
   return (
-    <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-      <ThemedText type="title">A&Y Sippop</ThemedText>
-      <Spacer style={{ marginVertical: 20 }} />
-      <ThemedText type='subtitle'>📍 Store Address</ThemedText>
-      <Spacer style={{ marginVertical: 10 }} />
-      <ThemedText>
-        Rizal St. Bgy. Basud
-      </ThemedText>
-      <ThemedText>
-        Nearby of Sto Niño, High school.
-      </ThemedText>
-      <Spacer style={{ marginVertical: 20 }} />
-      <ThemedText type='subtitle'>⏰ Store Hours</ThemedText>
-      <Spacer style={{ marginVertical: 5 }} />
-      <ThemedText>
-        Open EVERYDAY from 8am to 6pm.
-      </ThemedText>
-      <Spacer style={{ marginVertical: 20 }} />
-      <ThemedText type='subtitle'>📞 Contact Details</ThemedText>
-      <Spacer style={{ marginVertical: 5 }} />
-      {/* <ThemedText>
-        Yhenna Mae AB
-      </ThemedText> */}
-      {/* <Spacer style={{ marginVertical: 5 }} /> */}
-      <ThemedText>
-        Fb Page:
-      </ThemedText>
-      <ThemedText>
-        <ExternalLink href="https://web.facebook.com/AYSIPPOP">https://web.facebook.com/AYSIPPOP</ExternalLink>
-      </ThemedText>
-      <Spacer style={{ marginVertical: 5 }} />
-      <ThemedText>
-        WhatsApp:
-      </ThemedText>
-      <ThemedText>
-        <ExternalLink href="https://wa.me/639358114619">+63 935 811 4619</ExternalLink>
-      </ThemedText>
+    <ThemedView style={{ flex: 1 }}>
+      <ScreenHeader title="About" />
+      <ThemedView
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 20,
+        }}
+      >
+        <ThemedText type="title">A&Y Sippop</ThemedText>
+        <Spacer style={{ marginVertical: 20 }} />
+        <ThemedText type="subtitle">📍 Store Address</ThemedText>
+        <Spacer style={{ marginVertical: 10 }} />
+        <ThemedText>Rizal St. Bgy. Basud</ThemedText>
+        <ThemedText>Nearby of Sto Niño, High school.</ThemedText>
+        <Spacer style={{ marginVertical: 20 }} />
+        <ThemedText type="subtitle">⏰ Store Hours</ThemedText>
+        <Spacer style={{ marginVertical: 5 }} />
+        <ThemedText>Open Sunday to Friday from 8am to 6:30pm.</ThemedText>
+        <Spacer style={{ marginVertical: 20 }} />
+        <ThemedText type="subtitle">📞 Contact Details</ThemedText>
+        <Spacer style={{ marginVertical: 5 }} />
+        {/* <ThemedText>
+          Yhenna Mae AB
+        </ThemedText> */}
+        {/* <Spacer style={{ marginVertical: 5 }} /> */}
+        <ThemedText>Fb Page:</ThemedText>
+        <ThemedText>
+          <ExternalLink href="https://web.facebook.com/AYSIPPOP">
+            https://web.facebook.com/AYSIPPOP
+          </ExternalLink>
+        </ThemedText>
+        <Spacer style={{ marginVertical: 5 }} />
+        <ThemedText>WhatsApp:</ThemedText>
+        <ThemedText>
+          <ExternalLink href="https://wa.me/639358114619">
+            +63 935 811 4619
+          </ExternalLink>
+        </ThemedText>
+      </ThemedView>
     </ThemedView>
-  )
+  );
 
   // return (
   //   <ThemedView style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
@@ -57,24 +62,24 @@ export default function ProfileScreen() {
   //         Current: {isDark ? 'Dark' : 'Light'} {isSystemTheme ? '(System)' : '(Manual)'}
   //       </ThemedText>
 
-  //       <ThemedButton 
-  //         title={isDark ? "Switch to Light" : "Switch to Dark"} 
-  //         onPress={toggleTheme} 
-  //         style={{ borderRadius: 50, width: '100%', marginBottom: 10 }} 
+  //       <ThemedButton
+  //         title={isDark ? "Switch to Light" : "Switch to Dark"}
+  //         onPress={toggleTheme}
+  //         style={{ borderRadius: 50, width: '100%', marginBottom: 10 }}
   //       />
 
   //       {!isSystemTheme && (
-  //         <ThemedButton 
-  //           title="Reset to System Theme" 
-  //           onPress={resetToSystemTheme} 
-  //           style={{ borderRadius: 50, width: '100%', marginBottom: 10 }} 
+  //         <ThemedButton
+  //           title="Reset to System Theme"
+  //           onPress={resetToSystemTheme}
+  //           style={{ borderRadius: 50, width: '100%', marginBottom: 10 }}
   //         />
   //       )}
 
-  //       <ThemedButton 
-  //         title="Force System Theme Detection" 
-  //         onPress={forceSystemThemeDetection} 
-  //         style={{ borderRadius: 50, width: '100%' }} 
+  //       <ThemedButton
+  //         title="Force System Theme Detection"
+  //         onPress={forceSystemThemeDetection}
+  //         style={{ borderRadius: 50, width: '100%' }}
   //       />
   //     </ThemedView>
 

@@ -1,26 +1,23 @@
+import MenuDrawer from "@/components/MenuDrawer";
+import { useCart } from "@/context/CartContext";
+import { DrawerProvider, useDrawer } from "@/context/DrawerContext";
 import { useThemeColors } from "@/context/ThemeContext";
-import { useUser } from "@/hooks/useUser";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function TabLayout() {
+function TabLayoutInner() {
   const { theme } = useThemeColors();
-  const { user, isAuthChecked } = useUser();
-  // Only dim once the initial session check has resolved, so tabs don't
-  // flash disabled while auth state is still loading.
-  const loggedOut = isAuthChecked && !user;
+  const { cart } = useCart();
+  const { isOpen, closeDrawer } = useDrawer();
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarStyle: {
-            backgroundColor: theme.background,
-            borderTopColor: theme.border,
-            height: 80,
-          },
+          tabBarStyle: { display: "none" },
           tabBarActiveTintColor: theme.primary,
           tabBarInactiveTintColor: theme.text,
           tabBarItemStyle: {
@@ -50,15 +47,8 @@ export default function TabLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="cart" size={size} color={color} />
             ),
-            ...(loggedOut && {
-              tabBarActiveTintColor: theme.muted,
-              tabBarInactiveTintColor: theme.muted,
-            }),
-          }}
-          listeners={{
-            tabPress: (e) => {
-              if (loggedOut) e.preventDefault();
-            },
+            tabBarBadge: cartCount > 0 ? cartCount : undefined,
+            tabBarBadgeStyle: { backgroundColor: theme.primary },
           }}
         />
         <Tabs.Screen
@@ -68,15 +58,6 @@ export default function TabLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="receipt" size={size} color={color} />
             ),
-            ...(loggedOut && {
-              tabBarActiveTintColor: theme.muted,
-              tabBarInactiveTintColor: theme.muted,
-            }),
-          }}
-          listeners={{
-            tabPress: (e) => {
-              if (loggedOut) e.preventDefault();
-            },
           }}
         />
         <Tabs.Screen
@@ -98,6 +79,15 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
+      <MenuDrawer visible={isOpen} onClose={closeDrawer} />
     </SafeAreaView>
+  );
+}
+
+export default function TabLayout() {
+  return (
+    <DrawerProvider>
+      <TabLayoutInner />
+    </DrawerProvider>
   );
 }

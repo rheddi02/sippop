@@ -1,4 +1,4 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ScreenHeader from "@/components/ScreenHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useThemeColors } from "@/context/ThemeContext";
@@ -29,11 +29,9 @@ export default function OrdersScreen() {
   );
 
   return (
-    <ProtectedRoute>
+    <>
       <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.title}>
-          Orders
-        </ThemedText>
+        <ScreenHeader title="Orders" />
         <FlatList
           data={orders}
           keyExtractor={(item) => item.id}
@@ -41,19 +39,33 @@ export default function OrdersScreen() {
           onRefresh={refresh}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <ThemedText style={{ color: theme.muted, textAlign: "center", marginTop: 40 }}>
+            <ThemedText
+              style={{ color: theme.muted, textAlign: "center", marginTop: 40 }}
+            >
               {loading ? "Loading orders..." : "No orders yet."}
             </ThemedText>
           }
           renderItem={({ item }) => (
-            <View style={[styles.card, { borderColor: theme.border, backgroundColor: theme.card }]}>
+            <View
+              style={[
+                styles.card,
+                { borderColor: theme.border, backgroundColor: theme.card },
+              ]}
+            >
               <View style={styles.row}>
                 <ThemedText type="defaultSemiBold">
-                  {item.createdAt.toLocaleDateString()} {item.createdAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {item.createdAt.toLocaleDateString()}{" "}
+                  {item.createdAt.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </ThemedText>
                 <ThemedText
                   style={{
-                    color: item.status === "cancelled" ? theme.danger : theme.primary,
+                    color:
+                      item.status === "cancelled"
+                        ? theme.danger
+                        : theme.primary,
                     fontWeight: "600",
                   }}
                 >
@@ -61,35 +73,40 @@ export default function OrdersScreen() {
                 </ThemedText>
               </View>
               {item.items.map((line, index) => (
-                <ThemedText key={index} type="caption" style={{ color: theme.muted }}>
+                <ThemedText
+                  key={index}
+                  type="caption"
+                  style={{ color: theme.muted }}
+                >
                   {line.quantity}x {line.name} ({line.size})
                 </ThemedText>
               ))}
               <View style={[styles.row, { marginTop: 8 }]}>
                 <ThemedText type="caption" style={{ color: theme.muted }}>
-                  {item.paymentMethod === "credit" ? "Paid with store credit" : "Cash on pickup"}
+                  {item.paymentMethod === "credit"
+                    ? "Paid with store credit"
+                    : "Cash on pickup"}
                   {" · +"}
                   {item.pointsEarned} pts
                 </ThemedText>
-                <ThemedText type="defaultSemiBold">{formatPesoForCart(item.total)}</ThemedText>
+                <ThemedText type="defaultSemiBold">
+                  {formatPesoForCart(item.total)}
+                </ThemedText>
               </View>
             </View>
           )}
         />
       </ThemedView>
-    </ProtectedRoute>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-  },
-  title: {
-    marginBottom: 12,
   },
   list: {
+    paddingHorizontal: 16,
     paddingBottom: 32,
   },
   card: {

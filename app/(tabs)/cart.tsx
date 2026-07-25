@@ -1,5 +1,5 @@
 import ItemCard from "@/components/cart/itemCard";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ScreenHeader from "@/components/ScreenHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useOrders } from "@/context/OrdersContext";
@@ -7,6 +7,7 @@ import { useThemeColors } from "@/context/ThemeContext";
 import { useProfile } from "@/hooks/useProfile";
 import { formatPesoForPrice } from "@/utils/amountHelper";
 import { Ionicons } from "@expo/vector-icons";
+import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Alert, Linking, Pressable, StyleSheet } from "react-native";
 import { useCart } from "../../context/CartContext";
@@ -19,9 +20,15 @@ export default function CartScreen() {
   const [useCredit, setUseCredit] = useState(false);
   const { theme } = useThemeColors();
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const remainingCredit = profile ? profile.creditLimit - profile.creditBalance : 0;
-  const canUseCredit = !!profile && remainingCredit >= cartTotal && cartTotal > 0;
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const remainingCredit = profile
+    ? profile.creditLimit - profile.creditBalance
+    : 0;
+  const canUseCredit =
+    !!profile && remainingCredit >= cartTotal && cartTotal > 0;
 
   const handleClearCart = () => {
     Alert.alert(
@@ -47,9 +54,18 @@ export default function CartScreen() {
 
   // Still fires alongside the real order below — kept as a staff-visible
   // notification until the POS is confirmed to surface Supabase orders
-  // directly.
+  // directly. The text is also copied to the clipboard since Messenger's
+  // ?text= deep link doesn't reliably prefill the composer — pasting is
+  // the fallback that always works.
   const notifyMessenger = async () => {
-    const message = encodeURIComponent(formatOrderText());
+    const orderText = formatOrderText();
+    try {
+      await Clipboard.setStringAsync(orderText);
+    } catch {
+      // Non-fatal — the real order is already placed at this point.
+    }
+
+    const message = encodeURIComponent(orderText);
     const PAGE_USERNAME = "aysippop";
     const messengerWebUrl = `https://m.me/${PAGE_USERNAME}?text=${message}`;
     try {
@@ -70,45 +86,52 @@ export default function CartScreen() {
       await reloadProfile();
       Alert.alert(
         "Order placed",
-        useCredit
+        (useCredit
           ? "Charged to your store credit. See you soon!"
-          : "Pay at pickup. See you soon!",
+          : "Pay at pickup. See you soon!") +
+          "\n\nYour order details were copied — paste them into Messenger if they don't appear automatically.",
       );
     } catch (err) {
-      Alert.alert(
-        "Order failed",
-        err instanceof Error ? err.message : String(err),
-      );
+      // Supabase errors are plain objects with a `.message`, not Error
+      // instances, so `err instanceof Error` alone would fall through to
+      // `String(err)` -> "[object Object]".
+      const message =
+        err instanceof Error
+          ? err.message
+          : ((err as { message?: string })?.message ?? String(err));
+      Alert.alert("Order failed", message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <ProtectedRoute>
-      <ThemedView style={styles.container}>
-        <ThemedText bold type="title">
-          Cart
-        </ThemedText>
+    <>
+      <ScreenHeader
+        title="Cart"
+        right={
+          <ThemedView
+            style={{
+              padding: 8,
+              borderWidth: 1,
+              borderColor: theme.border,
+              borderRadius: 8,
+            }}
+          >
+            <Ionicons
+              disabled={cart.length === 0}
+              name="trash"
+              size={24}
+              color={cart.length === 0 ? "gray" : "red"}
+              onPress={handleClearCart}
+            />
+          </ThemedView>
+        }
+      />
+      <ThemedView style={styles.itemCountRow}>
         <ThemedText>
           {cart.length} item{cart.length > 1 ? "s" : ""}
         </ThemedText>
-        <ThemedView
-          style={{
-            padding: 8,
-            borderWidth: 1,
-            borderColor: theme.border,
-            borderRadius: 8,
-          }}
-        >
-          <Ionicons
-            disabled={cart.length === 0}
-            name="trash"
-            size={24}
-            color={cart.length === 0 ? "gray" : "red"}
-            onPress={handleClearCart}
-          />
-        </ThemedView>
       </ThemedView>
 
       {cart.length > 0 && (
@@ -119,11 +142,15 @@ export default function CartScreen() {
               styles.paymentOption,
               {
                 borderColor: !useCredit ? theme.primary : theme.border,
-                backgroundColor: !useCredit ? theme.primary + "20" : "transparent",
+                backgroundColor: !useCredit
+                  ? theme.primary + "20"
+                  : "transparent",
               },
             ]}
           >
-            <ThemedText style={{ color: !useCredit ? theme.primary : theme.text }}>
+            <ThemedText
+              style={{ color: !useCredit ? theme.primary : theme.text }}
+            >
               Pay at pickup
             </ThemedText>
           </Pressable>
@@ -134,12 +161,16 @@ export default function CartScreen() {
               styles.paymentOption,
               {
                 borderColor: useCredit ? theme.primary : theme.border,
-                backgroundColor: useCredit ? theme.primary + "20" : "transparent",
+                backgroundColor: useCredit
+                  ? theme.primary + "20"
+                  : "transparent",
                 opacity: canUseCredit ? 1 : 0.4,
               },
             ]}
           >
-            <ThemedText style={{ color: useCredit ? theme.primary : theme.text }}>
+            <ThemedText
+              style={{ color: useCredit ? theme.primary : theme.text }}
+            >
               Store credit
             </ThemedText>
             {profile && (
@@ -160,17 +191,14 @@ export default function CartScreen() {
           loading,
         }}
       />
-    </ProtectedRoute>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  itemCountRow: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
   paymentRow: {
     flexDirection: "row",

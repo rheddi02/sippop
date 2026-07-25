@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import * as Updates from "expo-updates";
 import { useEffect } from "react";
 import { Alert } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 function AppContent() {
   const { isDark } = useThemeColors();
@@ -53,8 +54,10 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <AppProviders>
-      <AppContent />
-    </AppProviders>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AppProviders>
+        <AppContent />
+      </AppProviders>
+    </GestureHandlerRootView>
   );
 }
