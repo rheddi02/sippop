@@ -7,6 +7,7 @@ import { ThemedText } from "./ThemedText";
 interface MenuItemPlaceholderProps {
   name: string;
   size: number;
+  height?: number;
   borderRadius?: number;
 }
 
@@ -25,21 +26,23 @@ function getFlavorStyle(name: string) {
 export default function MenuItemPlaceholder({
   name,
   size,
+  height,
   borderRadius = 8,
 }: MenuItemPlaceholderProps) {
   const { theme } = useThemeColors();
   const flavor = getFlavorStyle(name);
   const backgroundColor = flavor ? `${flavor.color}33` : `${theme.accent}33`;
   const iconColor = flavor ? flavor.color : theme.accent;
+  const resolvedHeight = height ?? size;
 
   return (
     <View
       style={[
         styles.container,
-        { width: size, height: size, backgroundColor, borderRadius },
+        { width: size, height: resolvedHeight, backgroundColor, borderRadius },
       ]}
     >
-      <Ionicons name={flavor?.icon ?? "cafe"} size={size * 0.28} color={iconColor} />
+      <Ionicons name={flavor?.icon ?? "cafe"} size={Math.min(size, resolvedHeight) * 0.28} color={iconColor} />
       <ThemedText
         type="caption"
         style={[styles.label, { color: iconColor }]}

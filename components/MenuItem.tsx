@@ -1,4 +1,5 @@
 import { CatalogItem } from "@/utils/types";
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
@@ -7,9 +8,16 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import {
+  ROW_CARD_WIDTH,
+  getCardImageHeight,
+  getGridCardWidth,
+} from "../constants/productCard";
+import { RADIUS, SPACING } from "../constants/spacing";
 import FavoriteButton from "./FavoriteButton";
 import MenuItemPlaceholder from "./MenuItemPlaceholder";
 import MenuItemPrice from "./MenuItemPrice";
+import ProductBadge from "./ProductBadge";
 import { ThemedCard } from "./ThemedCard";
 import { ThemedText } from "./ThemedText";
 
@@ -17,6 +25,8 @@ interface MenuItemProps {
   item: CatalogItem;
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
+  layout?: "grid" | "row";
+  badge?: string;
 }
 
 const AnimatedCard = Animated.createAnimatedComponent(ThemedCard);
@@ -25,11 +35,12 @@ export default function MenuItem({
   item,
   isFavorite = false,
   onToggleFavorite,
+  layout = "grid",
+  badge,
 }: MenuItemProps) {
   const { width: screenWidth } = useWindowDimensions();
-  const flatListPadding = 16; // 8px left + 8px right from gridContainer
-  const itemMargin = 16; // 8px margin on each side (4px + 4px from marginHorizontal)
-  const itemWidth = (screenWidth - flatListPadding - itemMargin) / 2;
+  const cardWidth = layout === "row" ? ROW_CARD_WIDTH : getGridCardWidth(screenWidth);
+  const imageHeight = getCardImageHeight(cardWidth);
 
   const scale = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({
@@ -56,39 +67,38 @@ export default function MenuItem({
     >
       <AnimatedCard
         variant="elevated"
-        style={[styles.container, animatedStyle, { width: itemWidth, height: 320 }]}
+        padding={0}
+        borderRadius={RADIUS.md}
+        style={[styles.container, animatedStyle, { width: cardWidth }]}
       >
         <View style={styles.favoriteButton}>
-          <FavoriteButton
-            isFavorite={isFavorite}
-            onToggle={handleToggleFavorite}
-          />
+          <FavoriteButton isFavorite={isFavorite} onToggle={handleToggleFavorite} size="small" />
         </View>
 
-        <View style={styles.imageContainer}>
-          <MenuItemPlaceholder name={item.name} size={160} />
+        {!!badge && <ProductBadge label={badge} />}
+
+        <View style={{ width: cardWidth, height: imageHeight }}>
+          {item.image ? (
+            <Image
+              source={item.image}
+              style={styles.image}
+              contentFit="cover"
+              transition={150}
+            />
+          ) : (
+            <MenuItemPlaceholder name={item.name} size={cardWidth} height={imageHeight} borderRadius={0} />
+          )}
         </View>
 
         <View style={styles.contentContainer}>
           <ThemedText
-            type="subtitle"
+            type="defaultSemiBold"
             style={styles.name}
-            numberOfLines={2}
+            numberOfLines={1}
             ellipsizeMode="tail"
           >
             {item.name}
           </ThemedText>
-
-          {!!item.description && (
-            <ThemedText
-              type="caption"
-              style={styles.description}
-              numberOfLines={2}
-              ellipsizeMode="tail"
-            >
-              {item.description}
-            </ThemedText>
-          )}
 
           <View style={styles.priceRow}>
             <MenuItemPrice sizes={item.sizes} />
@@ -102,42 +112,31 @@ export default function MenuItem({
 const styles = StyleSheet.create({
   container: {
     position: "relative",
-    justifyContent: "space-between",
     marginHorizontal: 4,
+    marginBottom: 8,
+  },
+  image: {
+    width: "100%",
+    height: "100%",
   },
   contentContainer: {
-    flex: 1,
-    justifyContent: "space-between",
-    paddingTop: 8,
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.md,
   },
   priceRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
   favoriteButton: {
     position: "absolute",
-    top: 12,
-    left: 12,
+    top: SPACING.sm,
+    left: SPACING.sm,
     zIndex: 1,
   },
-  imageContainer: {
-    alignItems: "center",
-    height: 160,
-    justifyContent: "center",
-    marginBottom: 8,
-    overflow: "hidden",
-  },
   name: {
-    marginBottom: 4,
-    fontSize: 16,
-    fontWeight: "600",
-    lineHeight: 20,
-  },
-  description: {
-    fontSize: 12,
-    lineHeight: 16,
-    marginBottom: 8,
+    marginBottom: 2,
   },
 });

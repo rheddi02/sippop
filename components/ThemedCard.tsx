@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewProps } from 'react-native';
+import { SHADOW } from '../constants/spacing';
 import { useThemeColors } from '../context/ThemeContext';
 
 export type ThemedCardProps = ViewProps & {
@@ -28,13 +29,7 @@ export function ThemedCard({
       margin,
       borderRadius,
     },
-    variant === 'elevated' && {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 3.84,
-      elevation: 5,
-    },
+    variant === 'elevated' && SHADOW.card,
     variant === 'outlined' && {
       borderWidth: 1,
     },

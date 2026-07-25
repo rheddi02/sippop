@@ -1,29 +1,36 @@
-import ThemedLoader from "@/components/ThemedLoader";
+import CategoryChips from "@/components/CategoryChips";
+import EmptyState from "@/components/EmptyState";
+import MenuDrawer from "@/components/MenuDrawer";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import PromoCarousel from "@/components/PromoCarousel";
+import SectionHeader from "@/components/SectionHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { COMING_SOON_IDS, FALLBACK_PROMOS, PromoConfig, TOP_SELLING_IDS } from "@/constants/featured";
+import { fetchPromos } from "@/api/promos";
+import { ROW_CARD_WIDTH, getCardHeight } from "@/constants/productCard";
+import { SPACING } from "@/constants/spacing";
 import { getCategories } from "@/constants/categories";
 import { CatalogItem } from "@/utils/types";
+import { getCuratedItems } from "@/utils/curatedMenu";
+import { getRecommendedItems } from "@/utils/recommendations";
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  FlatList,
-  LayoutChangeEvent,
   RefreshControl,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, {
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { fetchMenu } from "../../api/menu";
 import MenuItem from "../../components/MenuItem";
-import { ThemedButton } from "../../components/ThemedButton";
+import { useCart } from "../../context/CartContext";
 import { useFavorites } from "../../context/FavoritesContext";
+import { useOrders } from "../../context/OrdersContext";
 import { useThemeColors } from "../../context/ThemeContext";
 import { useUser } from "@/hooks/useUser";
 
@@ -37,17 +44,20 @@ export default function MenuScreen() {
   const { theme } = useThemeColors();
   const { user } = useUser();
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { cart } = useCart();
+  const { orders } = useOrders();
+
+  const { category: categoryParam } = useLocalSearchParams<{ category?: string }>();
+
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const [menu, setMenu] = useState<CatalogItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(true);
   const [menuError, setMenuError] = useState<string | null>(null);
-
-  const indicatorX = useSharedValue(0);
-  const indicatorWidth = useSharedValue(0);
-  const tabLayouts = React.useRef<Record<string, { x: number; width: number }>>({});
+  const [promos, setPromos] = useState<PromoConfig[]>(FALLBACK_PROMOS);
 
   const loadMenu = async (forceRefresh = false) => {
     try {
@@ -59,9 +69,44 @@ export default function MenuScreen() {
     }
   };
 
+  const loadPromos = async (forceRefresh = false) => {
+    try {
+      const rows = await fetchPromos(forceRefresh);
+      if (rows.length === 0) {
+        setPromos(FALLBACK_PROMOS);
+        return;
+      }
+      setPromos(
+        rows.map((row): PromoConfig => ({
+          id: row.id,
+          title: row.title,
+          subtitle: row.subtitle ?? undefined,
+          image: row.image_url ? { uri: row.image_url } : undefined,
+          route:
+            row.type === "category_cover" && row.category
+              ? `/(tabs)/menu?category=${row.category}`
+              : row.type === "product_campaign" && row.product_id
+                ? `/item/${row.product_id}`
+                : undefined,
+        }))
+      );
+    } catch {
+      // Network errors fall back to the static local promos silently —
+      // matches fetchMenu()'s resilience pattern.
+      setPromos(FALLBACK_PROMOS);
+    }
+  };
+
   useEffect(() => {
     loadMenu().finally(() => setMenuLoading(false));
+    loadPromos();
   }, []);
+
+  // A category_cover promo's route carries a ?category= param — apply it
+  // once on arrival so tapping the promo filters the grid below.
+  useEffect(() => {
+    if (categoryParam) setActiveCategory(categoryParam);
+  }, [categoryParam]);
 
   const filteredMenu = useMemo(() => {
     return menu.filter((item) => {
@@ -79,109 +124,70 @@ export default function MenuScreen() {
     });
   }, [menu, activeCategory, searchQuery, isFavorite]);
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadMenu(true);
-    setRefreshing(false);
-  };
-
   const categoriesList: CategoryTab[] = [
     ...getCategories(menu),
     { id: "favorite", name: "Favorites", count: favorites.length },
   ];
+  const activeCategoryLabel =
+    categoriesList.find((c) => c.id === activeCategory)?.name ?? "Menu";
 
-  const moveIndicatorTo = (id: string) => {
-    const layout = tabLayouts.current[id];
-    if (layout) {
-      indicatorX.value = withTiming(layout.x, { duration: 200 });
-      indicatorWidth.value = withTiming(layout.width, { duration: 200 });
-    }
+  const topSelling = useMemo(() => getCuratedItems(menu, TOP_SELLING_IDS), [menu]);
+  const recommended = useMemo(
+    () => getRecommendedItems(orders, menu, TOP_SELLING_IDS),
+    [orders, menu]
+  );
+  const comingSoon = useMemo(() => getCuratedItems(menu, COMING_SOON_IDS), [menu]);
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const rowCardHeight = getCardHeight(ROW_CARD_WIDTH);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([loadMenu(true), loadPromos(true)]);
+    setRefreshing(false);
   };
 
-  const handleTabLayout = (id: string, event: LayoutChangeEvent) => {
-    const { x, width } = event.nativeEvent.layout;
-    tabLayouts.current[id] = { x, width };
-    if (id === activeCategory) {
-      indicatorX.value = x;
-      indicatorWidth.value = width;
-    }
-  };
-
-  const handleSelectCategory = (id: string) => {
-    setActiveCategory(id);
-    moveIndicatorTo(id);
-  };
-
-  const indicatorStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: indicatorX.value }],
-    width: indicatorWidth.value,
-  }));
-
-  const renderMenuItem = ({
-    item,
-    index,
-  }: {
-    item: CatalogItem;
-    index: number;
-  }) => (
+  const renderMenuItem = ({ item, index }: { item: CatalogItem; index: number }) => (
     <Animated.View entering={FadeInDown.delay(Math.min(index, 10) * 40).springify()}>
       <MenuItem
         item={item}
         isFavorite={isFavorite(item.id)}
         onToggleFavorite={toggleFavorite}
+        layout="grid"
+        badge={TOP_SELLING_IDS.includes(item.id) ? "Top" : undefined}
       />
     </Animated.View>
   );
 
-  if (menuLoading) {
-    return (
-      <ThemedView style={[styles.container, styles.centerContent]}>
-        <ThemedLoader />
-      </ThemedView>
-    );
-  }
+  const renderRow = (items: CatalogItem[], badge?: string) => (
+    <View style={{ height: rowCardHeight }}>
+      <FlashList
+        data={items}
+        horizontal
+        keyExtractor={(item) => item.id}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.rowContent}
+        renderItem={({ item }) => (
+          <MenuItem
+            item={item}
+            layout="row"
+            isFavorite={isFavorite(item.id)}
+            onToggleFavorite={toggleFavorite}
+            badge={badge}
+          />
+        )}
+      />
+    </View>
+  );
 
-  if (menuError && menu.length === 0) {
-    return (
-      <ThemedView style={[styles.container, styles.centerContent]}>
-        <Ionicons name="cloud-offline-outline" size={40} color={theme.muted} />
-        <ThemedText
-          type="body"
-          style={{
-            color: theme.muted,
-            marginTop: 8,
-            textAlign: "center",
-            paddingHorizontal: 32,
-          }}
-        >
-          Couldn&apos;t load the menu. Check your connection and try again.
-        </ThemedText>
-        <ThemedButton title="Retry" onPress={() => loadMenu()} />
-      </ThemedView>
-    );
-  }
+  const renderHeader = () => (
+    <View>
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={() => setDrawerVisible(true)} hitSlop={8}>
+          <Ionicons name="menu" size={26} color={theme.text} />
+        </TouchableOpacity>
 
-  return (
-    <ThemedView style={[styles.container]}>
-      <ThemedView
-        style={{
-          overflow: "hidden",
-          padding: 20,
-          backgroundColor: theme.background,
-        }}
-      >
-        <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
-          <Ionicons name="person-circle" size={32} color={theme.primary} />
-          <ThemedText type="title">
-            {user
-              ? `Hello, ${user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.email}.`
-              : "Hello, Guest."}
-          </ThemedText>
-        </View>
-      </ThemedView>
-
-      {/* Search Bar */}
-      <ThemedView style={styles.searchContainer}>
         <View style={[styles.searchInputWrapper, { backgroundColor: theme.card }]}>
           <Ionicons name="search" size={18} color={theme.muted} />
           <TextInput
@@ -197,71 +203,115 @@ export default function MenuScreen() {
             </TouchableOpacity>
           )}
         </View>
-      </ThemedView>
 
-      {/* Category Tabs */}
-      <ThemedView style={[styles.tabContainer]}>
-        <View>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={categoriesList}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item: category }) => (
-              <TouchableOpacity
-                style={styles.tab}
-                onLayout={(e) => handleTabLayout(category.id, e)}
-                onPress={() => handleSelectCategory(category.id)}
-              >
-                <ThemedText
-                  style={[
-                    styles.tabText,
-                    {
-                      color:
-                        activeCategory === category.id
-                          ? theme.primary
-                          : theme.muted,
-                    },
-                  ]}
-                >
-                  {category.name}
-                </ThemedText>
-                <ThemedText
-                  style={[
-                    styles.tabCount,
-                    {
-                      color:
-                        activeCategory === category.id
-                          ? theme.primary
-                          : theme.muted,
-                    },
-                  ]}
-                >
-                  ({category.count})
-                </ThemedText>
-              </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/cart")} hitSlop={8}>
+          <View>
+            <Ionicons name="cart-outline" size={26} color={theme.text} />
+            {cartCount > 0 && (
+              <View style={[styles.cartBadge, { backgroundColor: theme.primary }]}>
+                <ThemedText style={styles.cartBadgeText}>{cartCount}</ThemedText>
+              </View>
             )}
-            contentContainerStyle={styles.tabsContent}
-          />
-          <Animated.View
-            style={[
-              styles.tabIndicator,
-              { backgroundColor: theme.primary },
-              indicatorStyle,
-            ]}
-          />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.greetingRow}>
+        <ThemedText type="title">
+          {user
+            ? `Hello, ${user.user_metadata?.full_name ?? user.user_metadata?.name ?? user.email}.`
+            : "Hello, Guest."}
+        </ThemedText>
+      </View>
+
+      <PromoCarousel promos={promos} />
+
+      <View style={styles.chipsRow}>
+        <CategoryChips
+          categories={categoriesList}
+          activeCategory={activeCategory}
+          onSelect={setActiveCategory}
+        />
+      </View>
+
+      {topSelling.length > 0 && (
+        <View style={styles.section}>
+          <SectionHeader title="Top Selling" />
+          {renderRow(topSelling, "Top")}
+        </View>
+      )}
+
+      {recommended.length > 0 && (
+        <View style={styles.section}>
+          <SectionHeader title="Recommended for you" />
+          {renderRow(recommended)}
+        </View>
+      )}
+
+      <SectionHeader title={activeCategoryLabel} />
+    </View>
+  );
+
+  const renderFooter = () => (
+    <View>
+      {comingSoon.length > 0 && (
+        <View style={styles.section}>
+          <SectionHeader title="Coming Soon" />
+          {renderRow(comingSoon, "Soon")}
+        </View>
+      )}
+      <View style={{ height: 100 }} />
+    </View>
+  );
+
+  if (menuLoading) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.topBar}>
+          <View style={[styles.skeletonBlock, { width: 26, height: 26, borderRadius: 13, backgroundColor: theme.border }]} />
+          <View style={[styles.searchInputWrapper, { backgroundColor: theme.card }]} />
+          <View style={[styles.skeletonBlock, { width: 26, height: 26, borderRadius: 13, backgroundColor: theme.border }]} />
+        </View>
+        <View style={[styles.skeletonBlock, styles.promoSkeleton, { backgroundColor: theme.card }]} />
+        <View style={styles.section}>
+          <View style={[styles.skeletonBlock, { width: 120, height: 20, marginLeft: SPACING.xl, marginBottom: SPACING.sm, backgroundColor: theme.card }]} />
+          <View style={{ flexDirection: "row", paddingHorizontal: SPACING.xl, gap: SPACING.sm }}>
+            <ProductCardSkeleton layout="row" />
+            <ProductCardSkeleton layout="row" />
+          </View>
+        </View>
+        <View style={styles.section}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", paddingHorizontal: SPACING.xl - SPACING.xs, gap: SPACING.sm }}>
+            <ProductCardSkeleton layout="grid" />
+            <ProductCardSkeleton layout="grid" />
+          </View>
         </View>
       </ThemedView>
+    );
+  }
 
-      {/* Menu Grid */}
-      <FlatList
-        key={activeCategory + searchQuery}
+  if (menuError && menu.length === 0) {
+    return (
+      <ThemedView style={styles.container}>
+        <EmptyState
+          icon="cloud-offline-outline"
+          title="Couldn't load the menu"
+          message="Check your connection and try again."
+          actionLabel="Retry"
+          onAction={() => loadMenu()}
+        />
+      </ThemedView>
+    );
+  }
+
+  return (
+    <ThemedView style={styles.container}>
+      <FlashList
         data={filteredMenu}
         keyExtractor={(item) => item.id}
         renderItem={renderMenuItem}
         numColumns={2}
         contentContainerStyle={styles.gridContainer}
-        columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -272,14 +322,16 @@ export default function MenuScreen() {
             progressBackgroundColor={theme.background}
           />
         }
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
         ListEmptyComponent={
-          <ThemedView style={styles.emptyState}>
-            <Ionicons name="cafe-outline" size={40} color={theme.muted} />
-            <ThemedText type="body" style={{ color: theme.muted, marginTop: 8 }}>
-              No drinks match your search.
-            </ThemedText>
-          </ThemedView>
+          <EmptyState icon="cafe-outline" title="No drinks match your search." />
         }
+      />
+      <MenuDrawer
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        onSelectFavorites={() => setActiveCategory("favorite")}
       />
     </ThemedView>
   );
@@ -289,55 +341,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  centerContent: {
-    justifyContent: "center",
+  topBar: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 24,
-  },
-  tabContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
-  tabsContent: {
-    paddingRight: 20,
-  },
-  tab: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginRight: 12,
-    alignItems: "center",
-  },
-  tabText: {
-    fontSize: 16,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  tabCount: {
-    fontSize: 12,
-    marginTop: 2,
-    fontWeight: "400",
-  },
-  tabIndicator: {
-    position: "absolute",
-    bottom: 0,
-    height: 2,
-    borderRadius: 1,
-  },
-  gridContainer: {
-    paddingHorizontal: 8,
-    paddingBottom: 100, // Space for checkout button
-    width: "100%",
-    alignItems: "flex-start",
-  },
-  row: {
-    justifyContent: "space-around",
-    marginBottom: -10,
-  },
-  searchContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 10,
+    gap: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    paddingTop: SPACING.md,
+    paddingBottom: SPACING.sm,
   },
   searchInputWrapper: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     height: 40,
@@ -350,11 +363,45 @@ const styles = StyleSheet.create({
     fontSize: 16,
     height: "100%",
   },
-  emptyState: {
-    flex: 1,
+  cartBadge: {
+    position: "absolute",
+    top: -4,
+    right: -6,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 80,
-    width: "100%",
+    paddingHorizontal: 3,
+  },
+  cartBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  greetingRow: {
+    paddingHorizontal: SPACING.xl,
+    paddingBottom: SPACING.md,
+  },
+  chipsRow: {
+    marginBottom: SPACING.lg,
+  },
+  section: {
+    marginBottom: SPACING.xl,
+  },
+  rowContent: {
+    paddingHorizontal: SPACING.xl,
+  },
+  gridContainer: {
+    paddingHorizontal: SPACING.xl - SPACING.xs,
+  },
+  skeletonBlock: {
+    borderRadius: 8,
+  },
+  promoSkeleton: {
+    height: 140,
+    marginHorizontal: SPACING.xl,
+    marginBottom: SPACING.xl,
+    borderRadius: 12,
   },
 });
