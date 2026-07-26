@@ -32,7 +32,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { fetchMenu } from "../../api/menu";
+import { fetchMenu, normalizeCategory } from "../../api/menu";
 import MenuItem from "../../components/MenuItem";
 import { useCart } from "../../context/CartContext";
 import { useDrawer } from "../../context/DrawerContext";
@@ -132,7 +132,14 @@ export default function MenuScreen() {
         title: row.title,
         subtitle: row.subtitle ?? undefined,
         image: row.image_url ? { uri: row.image_url } : undefined,
-        route: row.product_id ? `/item/${row.product_id}` : undefined,
+        route:
+          row.type === "campaign"
+            ? row.category
+              ? `/category/${normalizeCategory(row.category)}`
+              : undefined
+            : row.product_id
+              ? `/item/${row.product_id}`
+              : undefined,
       }),
     );
   }, [promoRows]);
@@ -345,13 +352,6 @@ export default function MenuScreen() {
               </TouchableOpacity>
             )}
           </View>
-
-          <TouchableOpacity
-            onPress={() => router.push("/(tabs)/favorites")}
-            hitSlop={8}
-          >
-            <Ionicons name="heart-outline" size={26} color={theme.text} />
-          </TouchableOpacity>
 
           <TouchableOpacity
             onPress={() => router.push("/(tabs)/cart")}

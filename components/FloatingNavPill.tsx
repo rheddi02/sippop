@@ -38,6 +38,20 @@ const ENTRIES: NavEntry[] = [
     iconActive: "receipt",
     iconInactive: "receipt-outline",
   },
+  {
+    key: "favorites",
+    route: "/(tabs)/favorites",
+    match: "/favorites",
+    iconActive: "heart",
+    iconInactive: "heart-outline",
+  },
+  {
+    key: "profile",
+    route: "/(tabs)/profile",
+    match: "/profile",
+    iconActive: "person",
+    iconInactive: "person-outline",
+  },
 ];
 
 export default function FloatingNavPill() {
