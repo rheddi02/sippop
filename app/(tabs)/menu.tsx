@@ -1,6 +1,6 @@
 import { fetchPromos, PromoRow } from "@/api/promos";
 import { fetchCategoryCovers, CategoryCoverRow } from "@/api/categoryCovers";
-import CategoryCoverCard, { CARD_HEIGHT as CATEGORY_COVER_CARD_HEIGHT } from "@/components/CategoryCoverCard";
+import CategoryCoverCard, { getCategoryCoverCardWidth } from "@/components/CategoryCoverCard";
 import EmptyState from "@/components/EmptyState";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import PromoCarousel from "@/components/PromoCarousel";
@@ -11,12 +11,12 @@ import {
   FALLBACK_PROMOS,
   PromoConfig,
 } from "@/constants/featured";
-import { ROW_CARD_WIDTH, getCardHeight } from "@/constants/productCard";
+import { ROW_CARD_WIDTH, getCardHeight, getCardImageHeight } from "@/constants/productCard";
 import { FLOATING_NAV_CLEARANCE, SPACING } from "@/constants/spacing";
 import { useUser } from "@/hooks/useUser";
 import { fetchTopSellingProducts, TopSellingRow } from "@/api/topSelling";
 import { getCategoryCovers } from "@/utils/categoryCovers";
-import { getRecommendedItems } from "@/utils/recommendations";
+import { groupMenuByCategory } from "@/utils/categoryGroups";
 import { getTopSellingItems } from "@/utils/topSelling";
 import { CatalogItem } from "@/utils/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,25 +30,21 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { fetchMenu } from "../../api/menu";
 import MenuItem from "../../components/MenuItem";
 import { useCart } from "../../context/CartContext";
 import { useDrawer } from "../../context/DrawerContext";
 import { useFavorites } from "../../context/FavoritesContext";
-import { useOrders } from "../../context/OrdersContext";
 import { useThemeColors } from "../../context/ThemeContext";
-
-// A little breathing room below CategoryCoverCard's own height so its
-// rounded corners/shadow aren't clipped by the row height.
-const CATEGORY_COVER_ROW_HEIGHT = CATEGORY_COVER_CARD_HEIGHT + SPACING.sm;
 
 export default function MenuScreen() {
   const { theme } = useThemeColors();
+  const { width: screenWidth } = useWindowDimensions();
   const { user } = useUser();
   const { toggleFavorite, isFavorite } = useFavorites();
   const { cart } = useCart();
-  const { orders } = useOrders();
   const { openDrawer } = useDrawer();
 
   const { category: categoryParam } = useLocalSearchParams<{
@@ -147,14 +143,14 @@ export default function MenuScreen() {
     () => getTopSellingItems(topSellingRows, menu),
     [topSellingRows, menu],
   );
-  const recommended = useMemo(
-    () => getRecommendedItems(orders, menu, topSelling.map((item) => item.id)),
-    [orders, menu, topSelling],
-  );
-
+  const categoryGroups = useMemo(() => groupMenuByCategory(menu), [menu]);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const rowCardHeight = getCardHeight(ROW_CARD_WIDTH);
+  // A little breathing room below the card's own height so its rounded
+  // corners/shadow aren't clipped by the row height.
+  const categoryCoverRowHeight =
+    getCardImageHeight(getCategoryCoverCardWidth(screenWidth)) + SPACING.sm;
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -188,7 +184,7 @@ export default function MenuScreen() {
   );
 
   const renderCategoryCovers = () => (
-    <View style={[styles.rowContent, { height: CATEGORY_COVER_ROW_HEIGHT }]}>
+    <View style={[styles.rowContent, { height: categoryCoverRowHeight }]}>
       <FlashList
         data={categoryCovers}
         horizontal
@@ -230,12 +226,15 @@ export default function MenuScreen() {
         </View>
       )}
 
-      {recommended.length > 0 && (
-        <View style={styles.section}>
-          <SectionHeader title="Recommended for you" />
-          {renderRow(recommended)}
+      {categoryGroups.map((group) => (
+        <View key={group.categoryId} style={styles.section}>
+          <SectionHeader
+            title={group.label}
+            onSeeAll={() => router.push(`/category/${group.categoryId}`)}
+          />
+          {renderRow(group.items)}
         </View>
-      )}
+      ))}
     </View>
   );
 

@@ -1,16 +1,20 @@
 import { Image } from "expo-image";
-import { Pressable, StyleSheet, View } from "react-native";
-import { CATEGORY_LABELS } from "@/constants/categories";
+import { Pressable, StyleSheet, useWindowDimensions } from "react-native";
 import { getCardImageHeight } from "@/constants/productCard";
 import { RADIUS, SPACING } from "@/constants/spacing";
 import { CategoryCover } from "@/utils/categoryCovers";
 import { ThemedCard } from "./ThemedCard";
-import { ThemedText } from "./ThemedText";
 
-export const CARD_WIDTH = 160;
-// 2:3 portrait, same ratio as the product grid's own card image
-// (constants/productCard.ts's getCardImageHeight).
-export const CARD_HEIGHT = getCardImageHeight(CARD_WIDTH);
+const CARD_GAP = SPACING.sm; // matches the card's own marginRight below
+// Fraction of the next card left peeking at the row's edge, so the row
+// reads as "one full card, plus a hint there's more" instead of a cramped
+// strip of several small, hard-to-read cards.
+const PEEK_FRACTION = 0.3;
+
+export function getCategoryCoverCardWidth(screenWidth: number): number {
+  const visibleWidth = screenWidth - SPACING.xl * 2; // same canonical gutter as constants/productCard.ts's getGridCardWidth
+  return (visibleWidth - CARD_GAP) / (1 + PEEK_FRACTION);
+}
 
 export default function CategoryCoverCard({
   cover,
@@ -19,6 +23,12 @@ export default function CategoryCoverCard({
   cover: CategoryCover;
   onPress: (categoryId: string) => void;
 }) {
+  const { width: screenWidth } = useWindowDimensions();
+  const cardWidth = getCategoryCoverCardWidth(screenWidth);
+  // 2:3 portrait, same ratio as the product grid's own card image
+  // (constants/productCard.ts's getCardImageHeight).
+  const cardHeight = getCardImageHeight(cardWidth);
+
   return (
     <Pressable onPress={() => onPress(cover.categoryId)}>
       <ThemedCard
@@ -26,18 +36,13 @@ export default function CategoryCoverCard({
         borderRadius={RADIUS.md}
         padding={0}
         margin={0}
-        style={styles.card}
+        style={[styles.card, { width: cardWidth, height: cardHeight }]}
       >
         <Image
           source={cover.image}
           style={StyleSheet.absoluteFillObject}
           contentFit="cover"
         />
-        <View style={styles.overlay}>
-          <ThemedText type="label" style={styles.title} numberOfLines={2}>
-            {CATEGORY_LABELS[cover.categoryId] ?? cover.categoryId}
-          </ThemedText>
-        </View>
       </ThemedCard>
     </Pressable>
   );
@@ -45,19 +50,7 @@ export default function CategoryCoverCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    justifyContent: "flex-end",
     overflow: "hidden",
-    marginRight: SPACING.sm,
-  },
-  overlay: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    backgroundColor: "rgba(0,0,0,0.45)",
-  },
-  title: {
-    color: "#FFFFFF",
-    fontWeight: "700",
+    marginRight: CARD_GAP,
   },
 });
