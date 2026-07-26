@@ -1,14 +1,10 @@
 import { supabase } from "@/lib/supabase";
 
-export type PromoType = "category_cover" | "product_campaign";
-
-interface PromoRow {
+export interface PromoRow {
   id: string;
-  type: PromoType;
   title: string;
   subtitle: string | null;
   image_url: string | null;
-  category: string | null;
   product_id: string | null;
   original_price: number | null;
   promo_price: number | null;
@@ -25,7 +21,7 @@ export async function fetchPromos(forceRefresh = false): Promise<PromoRow[]> {
 
   const { data, error } = await supabase
     .from("promos")
-    .select("id,type,title,subtitle,image_url,category,product_id,original_price,promo_price,sort_order")
+    .select("id,title,subtitle,image_url,product_id,original_price,promo_price,sort_order")
     .order("sort_order", { ascending: true });
 
   if (error) throw error;

@@ -1,17 +1,20 @@
 import { ImageSourcePropType } from "react-native";
 
 // Local, hand-curated content for sections that have no backing Supabase
-// table/RPC/flag today (top-selling, coming-soon, and the promos fallback).
-// Edit this file directly to change what shows — no backend change required.
+// table/RPC/flag today (coming-soon, and the promos fallback). Edit this
+// file directly to change what shows — no backend change required.
 //
 // Promos now come live from the `promos` table (see api/promos.ts) —
 // FALLBACK_PROMOS below is only shown when that fetch fails or is empty.
 //
-// TOP_SELLING_IDS / COMING_SOON_IDS reference CatalogItem.id as returned by
-// fetchMenu() (api/menu.ts), which for a multi-size flavor (e.g. "Blueberry
-// Milk") is the *smallest/first size variant's* underlying products row id,
-// not a size-specific id. Ids that no longer match anything in the fetched
-// menu are silently dropped by getCuratedItems (utils/curatedMenu.ts) rather
+// Top Selling is no longer hand-curated here — it's computed live from real
+// order data (see api/topSelling.ts and utils/topSelling.ts).
+//
+// COMING_SOON_IDS references CatalogItem.id as returned by fetchMenu()
+// (api/menu.ts), which for a multi-size flavor (e.g. "Blueberry Milk") is
+// the *smallest/first size variant's* underlying products row id, not a
+// size-specific id. Ids that no longer match anything in the fetched menu
+// are silently dropped by getCuratedItems (utils/curatedMenu.ts) rather
 // than erroring, so stale/typo'd ids just make the section render fewer
 // items instead of crashing — worth double-checking in QA since there's no
 // admin UI validating these against the live catalog.
@@ -47,14 +50,6 @@ export const FALLBACK_PROMOS: PromoConfig[] = [
     title: "Matcha, your way",
     subtitle: "Hot or iced, classic or strawberry",
   },
-];
-
-export const TOP_SELLING_IDS: string[] = [
-  "bbe27d7f-3c4f-4ebb-8199-cde69cf268c3", // Matcha Latte
-  "23e1c934-861b-4e10-b285-d3cb08a57393", // Oreo Latte
-  "4267a0f0-721c-4624-98d1-aff73fc7ac90", // Mocha Latte
-  "5c800251-3241-444a-91e2-7adcf6fd2ff2", // Affogato Matcha
-  "0d81b5bc-3d36-4f9c-b38a-fb8e7bc81285", // Choco Krunch
 ];
 
 export const COMING_SOON_IDS: string[] = [

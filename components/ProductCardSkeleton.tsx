@@ -2,6 +2,7 @@ import { useThemeColors } from "@/context/ThemeContext";
 import React from "react";
 import { StyleSheet, View, useWindowDimensions } from "react-native";
 import {
+  CARD_BOTTOM_MARGIN,
   ROW_CARD_WIDTH,
   getCardImageHeight,
   getGridCardWidth,
@@ -42,7 +43,7 @@ export default function ProductCardSkeleton({
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 4,
-    marginBottom: 8,
+    marginBottom: CARD_BOTTOM_MARGIN,
   },
   textBlock: {
     paddingHorizontal: SPACING.md,

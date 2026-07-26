@@ -32,7 +32,7 @@ const POS_CATEGORY_MAP: Record<string, CategoryId> = {
   others: "others",
 };
 
-function normalizeCategory(raw: string): CategoryId {
+export function normalizeCategory(raw: string): CategoryId {
   return POS_CATEGORY_MAP[raw.trim().toLowerCase()] ?? (raw.trim().toLowerCase() as CategoryId);
 }
 

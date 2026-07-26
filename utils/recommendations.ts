@@ -1,3 +1,4 @@
+import { buildCatalogItemIndex, rankCatalogItemIds } from "./catalogRanking";
 import { getCuratedItems } from "./curatedMenu";
 import { CatalogItem, Order } from "./types";
 
@@ -14,12 +15,7 @@ export function getRecommendedItems(
   fallbackIds: string[],
   limit = 10
 ): CatalogItem[] {
-  const catalogItemByProductId = new Map<string, CatalogItem>();
-  for (const item of menu) {
-    for (const size of item.sizes) {
-      if (size.productId) catalogItemByProductId.set(size.productId, item);
-    }
-  }
+  const catalogItemByProductId = buildCatalogItemIndex(menu);
 
   const counts = new Map<string, number>();
   for (const order of orders) {
@@ -30,11 +26,7 @@ export function getRecommendedItems(
     }
   }
 
-  const ranked = Array.from(counts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([id]) => id);
-
+  const ranked = rankCatalogItemIds(counts, limit);
   const items = getCuratedItems(menu, ranked);
   return items.length > 0 ? items : getCuratedItems(menu, fallbackIds);
 }

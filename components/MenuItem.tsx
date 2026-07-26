@@ -9,6 +9,7 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import {
+  CARD_BOTTOM_MARGIN,
   ROW_CARD_WIDTH,
   getCardImageHeight,
   getGridCardWidth,
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     marginHorizontal: 4,
-    marginBottom: 8,
+    marginBottom: CARD_BOTTOM_MARGIN,
   },
   image: {
     width: "100%",

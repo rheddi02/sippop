@@ -1,6 +1,6 @@
-import { CatalogItem, CategoryId } from "@/utils/types";
+import { CategoryId } from "@/utils/types";
 
-const CATEGORY_LABELS: Record<CategoryId, string> = {
+export const CATEGORY_LABELS: Record<CategoryId, string> = {
   soda: "Soda",
   milk: "Milk",
   matcha: "Matcha",
@@ -13,28 +13,3 @@ const CATEGORY_LABELS: Record<CategoryId, string> = {
   krunch: "Krunch",
   others: "Others",
 };
-
-const CATEGORY_ORDER: CategoryId[] = [
-  "soda",
-  "milk",
-  "matcha",
-  "biscoff",
-  "oreo",
-  "coffee",
-  "chocolate",
-  "hotdrinks",
-  "signature",
-  "krunch",
-  "others",
-];
-
-export function getCategories(menu: CatalogItem[]) {
-  return [
-    { id: "all", name: "All", count: menu.length },
-    ...CATEGORY_ORDER.map((id) => ({
-      id,
-      name: CATEGORY_LABELS[id],
-      count: menu.filter((item) => item.category === id).length,
-    })),
-  ];
-}

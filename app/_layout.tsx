@@ -47,6 +47,10 @@ function AppContent() {
           name="item/[id]"
           options={{ animation: "fade_from_bottom", animationDuration: 220 }}
         />
+        <Stack.Screen
+          name="category/[id]"
+          options={{ animation: "fade_from_bottom", animationDuration: 220 }}
+        />
       </Stack>
     </>
   );
