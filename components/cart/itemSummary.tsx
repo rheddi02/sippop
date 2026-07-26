@@ -1,3 +1,4 @@
+import { FLOATING_NAV_CLEARANCE } from "@/constants/spacing";
 import { useThemeColors } from "@/context";
 import { formatPesoForCart } from "@/utils/amountHelper";
 import { CartItem } from "@/utils/types";
@@ -48,6 +49,7 @@ const styles = StyleSheet.create({
   container: {
     borderTopWidth: 1,
     paddingTop: 20,
+    paddingBottom: FLOATING_NAV_CLEARANCE,
   },
   checkoutPrice: {
     fontSize: 32,

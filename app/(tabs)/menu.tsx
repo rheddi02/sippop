@@ -1,4 +1,6 @@
-import CategoryChips from "@/components/CategoryChips";
+import { fetchPromos, PromoRow } from "@/api/promos";
+import { fetchCategoryCovers, CategoryCoverRow } from "@/api/categoryCovers";
+import CategoryCoverCard, { CARD_HEIGHT as CATEGORY_COVER_CARD_HEIGHT } from "@/components/CategoryCoverCard";
 import EmptyState from "@/components/EmptyState";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import PromoCarousel from "@/components/PromoCarousel";
@@ -6,30 +8,29 @@ import SectionHeader from "@/components/SectionHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import {
-  COMING_SOON_IDS,
   FALLBACK_PROMOS,
   PromoConfig,
-  TOP_SELLING_IDS,
 } from "@/constants/featured";
-import { fetchPromos } from "@/api/promos";
 import { ROW_CARD_WIDTH, getCardHeight } from "@/constants/productCard";
-import { SPACING } from "@/constants/spacing";
-import { getCategories } from "@/constants/categories";
-import { CatalogItem } from "@/utils/types";
-import { getCuratedItems } from "@/utils/curatedMenu";
+import { FLOATING_NAV_CLEARANCE, SPACING } from "@/constants/spacing";
+import { useUser } from "@/hooks/useUser";
+import { fetchTopSellingProducts, TopSellingRow } from "@/api/topSelling";
+import { getCategoryCovers } from "@/utils/categoryCovers";
 import { getRecommendedItems } from "@/utils/recommendations";
+import { getTopSellingItems } from "@/utils/topSelling";
+import { CatalogItem } from "@/utils/types";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   RefreshControl,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { fetchMenu } from "../../api/menu";
 import MenuItem from "../../components/MenuItem";
 import { useCart } from "../../context/CartContext";
@@ -37,18 +38,15 @@ import { useDrawer } from "../../context/DrawerContext";
 import { useFavorites } from "../../context/FavoritesContext";
 import { useOrders } from "../../context/OrdersContext";
 import { useThemeColors } from "../../context/ThemeContext";
-import { useUser } from "@/hooks/useUser";
 
-interface CategoryTab {
-  id: string;
-  name: string;
-  count: number;
-}
+// A little breathing room below CategoryCoverCard's own height so its
+// rounded corners/shadow aren't clipped by the row height.
+const CATEGORY_COVER_ROW_HEIGHT = CATEGORY_COVER_CARD_HEIGHT + SPACING.sm;
 
 export default function MenuScreen() {
   const { theme } = useThemeColors();
   const { user } = useUser();
-  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const { cart } = useCart();
   const { orders } = useOrders();
   const { openDrawer } = useDrawer();
@@ -57,14 +55,15 @@ export default function MenuScreen() {
     category?: string;
   }>();
 
-  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [menu, setMenu] = useState<CatalogItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(true);
   const [menuError, setMenuError] = useState<string | null>(null);
-  const [promos, setPromos] = useState<PromoConfig[]>(FALLBACK_PROMOS);
+  const [promoRows, setPromoRows] = useState<PromoRow[]>([]);
+  const [categoryCoverRows, setCategoryCoverRows] = useState<CategoryCoverRow[]>([]);
+  const [topSellingRows, setTopSellingRows] = useState<TopSellingRow[]>([]);
 
   const loadMenu = async (forceRefresh = false) => {
     try {
@@ -79,76 +78,78 @@ export default function MenuScreen() {
   const loadPromos = async (forceRefresh = false) => {
     try {
       const rows = await fetchPromos(forceRefresh);
-      if (rows.length === 0) {
-        setPromos(FALLBACK_PROMOS);
-        return;
-      }
-      setPromos(
-        rows.map((row): PromoConfig => ({
-          id: row.id,
-          title: row.title,
-          subtitle: row.subtitle ?? undefined,
-          image: row.image_url ? { uri: row.image_url } : undefined,
-          route:
-            row.type === "category_cover" && row.category
-              ? `/(tabs)/menu?category=${row.category}`
-              : row.type === "product_campaign" && row.product_id
-                ? `/item/${row.product_id}`
-                : undefined,
-        })),
-      );
+      setPromoRows(rows);
     } catch {
       // Network errors fall back to the static local promos silently —
       // matches fetchMenu()'s resilience pattern.
-      setPromos(FALLBACK_PROMOS);
+      setPromoRows([]);
+    }
+  };
+
+  const loadCategoryCovers = async (forceRefresh = false) => {
+    try {
+      const rows = await fetchCategoryCovers(forceRefresh);
+      setCategoryCoverRows(rows);
+    } catch {
+      // Degraded state is fine — the section simply doesn't render when
+      // categoryCovers.length === 0, same resilience pattern as loadPromos.
+      setCategoryCoverRows([]);
+    }
+  };
+
+  const loadTopSelling = async (forceRefresh = false) => {
+    try {
+      const rows = await fetchTopSellingProducts(forceRefresh);
+      setTopSellingRows(rows);
+    } catch {
+      // Degraded state is fine — the section simply doesn't render when
+      // topSelling.length === 0, same resilience pattern as loadPromos.
+      setTopSellingRows([]);
     }
   };
 
   useEffect(() => {
     loadMenu().finally(() => setMenuLoading(false));
     loadPromos();
+    loadCategoryCovers();
+    loadTopSelling();
   }, []);
 
-  // A category_cover promo's route carries a ?category= param — apply it
-  // once on arrival so tapping the promo filters the grid below.
+  // Supports deep-linking straight into a filtered category via ?category=
+  // (e.g. from a push notification or share link) — redirects into the
+  // dedicated category screen rather than filtering in place, since this
+  // screen no longer has a product grid of its own to filter.
   useEffect(() => {
-    if (categoryParam) setActiveCategory(categoryParam);
+    if (categoryParam) {
+      router.push(`/category/${categoryParam}`);
+      // Clear the param so navigating back to this route doesn't re-trigger
+      // the redirect and trap the user in a bounce loop.
+      router.setParams({ category: undefined });
+    }
   }, [categoryParam]);
 
-  const filteredMenu = useMemo(() => {
-    return menu.filter((item) => {
-      const matchesCategory =
-        activeCategory === "all" ||
-        (activeCategory === "favorite"
-          ? isFavorite(item.id)
-          : item.category === activeCategory);
-      const query = searchQuery.toLowerCase();
-      const matchesSearch =
-        item.name.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query) ||
-        item.ingredientNames.some((n) => n.toLowerCase().includes(query));
-      return matchesCategory && matchesSearch;
-    });
-  }, [menu, activeCategory, searchQuery, isFavorite]);
+  const promos = useMemo<PromoConfig[]>(() => {
+    if (promoRows.length === 0) return FALLBACK_PROMOS;
+    return promoRows.map(
+      (row): PromoConfig => ({
+        id: row.id,
+        title: row.title,
+        subtitle: row.subtitle ?? undefined,
+        image: row.image_url ? { uri: row.image_url } : undefined,
+        route: row.product_id ? `/item/${row.product_id}` : undefined,
+      }),
+    );
+  }, [promoRows]);
 
-  const categoriesList: CategoryTab[] = [
-    ...getCategories(menu),
-    { id: "favorite", name: "Favorites", count: favorites.length },
-  ];
-  const activeCategoryLabel =
-    categoriesList.find((c) => c.id === activeCategory)?.name ?? "Menu";
+  const categoryCovers = useMemo(() => getCategoryCovers(categoryCoverRows), [categoryCoverRows]);
 
   const topSelling = useMemo(
-    () => getCuratedItems(menu, TOP_SELLING_IDS),
-    [menu],
+    () => getTopSellingItems(topSellingRows, menu),
+    [topSellingRows, menu],
   );
   const recommended = useMemo(
-    () => getRecommendedItems(orders, menu, TOP_SELLING_IDS),
-    [orders, menu],
-  );
-  const comingSoon = useMemo(
-    () => getCuratedItems(menu, COMING_SOON_IDS),
-    [menu],
+    () => getRecommendedItems(orders, menu, topSelling.map((item) => item.id)),
+    [orders, menu, topSelling],
   );
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -157,38 +158,22 @@ export default function MenuScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([loadMenu(true), loadPromos(true)]);
+    await Promise.all([loadMenu(true), loadPromos(true), loadCategoryCovers(true), loadTopSelling(true)]);
     setRefreshing(false);
   };
 
-  const renderMenuItem = ({
-    item,
-    index,
-  }: {
-    item: CatalogItem;
-    index: number;
-  }) => (
-    <Animated.View
-      entering={FadeInDown.delay(Math.min(index, 10) * 40).springify()}
-    >
-      <MenuItem
-        item={item}
-        isFavorite={isFavorite(item.id)}
-        onToggleFavorite={toggleFavorite}
-        layout="grid"
-        badge={TOP_SELLING_IDS.includes(item.id) ? "Top" : undefined}
-      />
-    </Animated.View>
-  );
-
   const renderRow = (items: CatalogItem[], badge?: string) => (
-    <View style={{ height: rowCardHeight }}>
+    // FlashList's own contentContainerStyle padding isn't reliably respected
+    // for horizontal lists (its docs warn padding on the internal layout
+    // container "is not" safe, unlike margin) — so the inset is applied on
+    // this real wrapping View instead, which behaves like standard RN box
+    // model regardless of FlashList's internals.
+    <View style={[styles.rowContent, { height: rowCardHeight }]}>
       <FlashList
         data={items}
         horizontal
         keyExtractor={(item) => item.id}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.rowContent}
         renderItem={({ item }) => (
           <MenuItem
             item={item}
@@ -202,50 +187,25 @@ export default function MenuScreen() {
     </View>
   );
 
+  const renderCategoryCovers = () => (
+    <View style={[styles.rowContent, { height: CATEGORY_COVER_ROW_HEIGHT }]}>
+      <FlashList
+        data={categoryCovers}
+        horizontal
+        keyExtractor={(item) => item.id}
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <CategoryCoverCard
+            cover={item}
+            onPress={(categoryId) => router.push(`/category/${categoryId}`)}
+          />
+        )}
+      />
+    </View>
+  );
+
   const renderHeader = () => (
     <View>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={openDrawer} hitSlop={8}>
-          <Ionicons name="menu" size={26} color={theme.text} />
-        </TouchableOpacity>
-
-        <View
-          style={[styles.searchInputWrapper, { backgroundColor: theme.card }]}
-        >
-          <Ionicons name="search" size={18} color={theme.muted} />
-          <TextInput
-            style={[styles.searchInput, { color: theme.text }]}
-            placeholder="Search menu..."
-            placeholderTextColor={theme.muted}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")} hitSlop={8}>
-              <Ionicons name="close-circle" size={18} color={theme.muted} />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <TouchableOpacity
-          onPress={() => router.push("/(tabs)/cart")}
-          hitSlop={8}
-        >
-          <View>
-            <Ionicons name="cart-outline" size={26} color={theme.text} />
-            {cartCount > 0 && (
-              <View
-                style={[styles.cartBadge, { backgroundColor: theme.primary }]}
-              >
-                <ThemedText style={styles.cartBadgeText}>
-                  {cartCount}
-                </ThemedText>
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.greetingRow}>
         <ThemedText type="title">
           {user
@@ -256,13 +216,12 @@ export default function MenuScreen() {
 
       <PromoCarousel promos={promos} />
 
-      <View style={styles.chipsRow}>
-        <CategoryChips
-          categories={categoriesList}
-          activeCategory={activeCategory}
-          onSelect={setActiveCategory}
-        />
-      </View>
+      {categoryCovers.length > 0 && (
+        <View style={styles.section}>
+          <SectionHeader title="Shop by Category" />
+          {renderCategoryCovers()}
+        </View>
+      )}
 
       {topSelling.length > 0 && (
         <View style={styles.section}>
@@ -277,20 +236,6 @@ export default function MenuScreen() {
           {renderRow(recommended)}
         </View>
       )}
-
-      <SectionHeader title={activeCategoryLabel} />
-    </View>
-  );
-
-  const renderFooter = () => (
-    <View>
-      {comingSoon.length > 0 && (
-        <View style={styles.section}>
-          <SectionHeader title="Coming Soon" />
-          {renderRow(comingSoon, "Soon")}
-        </View>
-      )}
-      <View style={{ height: 100 }} />
     </View>
   );
 
@@ -355,19 +300,6 @@ export default function MenuScreen() {
             <ProductCardSkeleton layout="row" />
           </View>
         </View>
-        <View style={styles.section}>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              paddingHorizontal: SPACING.xl - SPACING.xs,
-              gap: SPACING.sm,
-            }}
-          >
-            <ProductCardSkeleton layout="grid" />
-            <ProductCardSkeleton layout="grid" />
-          </View>
-        </View>
       </ThemedView>
     );
   }
@@ -388,13 +320,63 @@ export default function MenuScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <FlashList
-        data={filteredMenu}
-        keyExtractor={(item) => item.id}
-        renderItem={renderMenuItem}
-        numColumns={2}
-        contentContainerStyle={styles.gridContainer}
+      {/* Rendered as a plain sibling above the ScrollView so it's simply
+          outside the scrollable content — the standard way to keep a header
+          fixed in place while the rest scrolls underneath it. */}
+      <View style={[styles.stickyHeader, { backgroundColor: theme.background }]}>
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={openDrawer} hitSlop={8}>
+            <Ionicons name="menu" size={26} color={theme.text} />
+          </TouchableOpacity>
+
+          <View
+            style={[styles.searchInputWrapper, { backgroundColor: theme.card }]}
+          >
+            <Ionicons name="search" size={18} color={theme.muted} />
+            <TextInput
+              style={[styles.searchInput, { color: theme.text }]}
+              placeholder="Search menu..."
+              placeholderTextColor={theme.muted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery("")} hitSlop={8}>
+                <Ionicons name="close-circle" size={18} color={theme.muted} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/favorites")}
+            hitSlop={8}
+          >
+            <Ionicons name="heart-outline" size={26} color={theme.text} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/cart")}
+            hitSlop={8}
+          >
+            <View>
+              <Ionicons name="cart-outline" size={26} color={theme.text} />
+              {cartCount > 0 && (
+                <View
+                  style={[styles.cartBadge, { backgroundColor: theme.primary }]}
+                >
+                  <ThemedText style={styles.cartBadgeText}>
+                    {cartCount}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: FLOATING_NAV_CLEARANCE }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -404,15 +386,9 @@ export default function MenuScreen() {
             progressBackgroundColor={theme.background}
           />
         }
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
-        ListEmptyComponent={
-          <EmptyState
-            icon="cafe-outline"
-            title="No drinks match your search."
-          />
-        }
-      />
+      >
+        {renderHeader()}
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -420,6 +396,12 @@ export default function MenuScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  stickyHeader: {
+    // Rendered as a plain sibling above the ScrollView (see main return) —
+    // outside the scrollable content entirely, so it simply never scrolls
+    // away.
+    zIndex: 1,
   },
   topBar: {
     flexDirection: "row",
@@ -457,22 +439,21 @@ const styles = StyleSheet.create({
   cartBadgeText: {
     color: "#FFFFFF",
     fontSize: 10,
+    lineHeight: 12,
     fontWeight: "700",
   },
   greetingRow: {
     paddingHorizontal: SPACING.xl,
     paddingBottom: SPACING.md,
   },
-  chipsRow: {
-    marginBottom: SPACING.lg,
-  },
   section: {
     marginBottom: SPACING.xl,
   },
   rowContent: {
-    paddingHorizontal: SPACING.xl,
-  },
-  gridContainer: {
+    // MenuItem's card carries its own marginHorizontal: 4, so this is
+    // reduced by that amount to land on the same 20px visible edge as the
+    // banner/header (see getGridCardWidth in constants/productCard.ts,
+    // which assumes the same SPACING.xl total screen gutter).
     paddingHorizontal: SPACING.xl - SPACING.xs,
   },
   skeletonBlock: {

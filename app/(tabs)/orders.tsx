@@ -1,6 +1,7 @@
 import ScreenHeader from "@/components/ScreenHeader";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { FLOATING_NAV_CLEARANCE } from "@/constants/spacing";
 import { useThemeColors } from "@/context/ThemeContext";
 import { formatPesoForCart } from "@/utils/amountHelper";
 import { Order } from "@/utils/types";
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 16,
-    paddingBottom: 32,
+    paddingBottom: FLOATING_NAV_CLEARANCE,
   },
   card: {
     borderWidth: 1,

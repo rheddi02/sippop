@@ -1,3 +1,4 @@
+import FloatingNavPill from "@/components/FloatingNavPill";
 import MenuDrawer from "@/components/MenuDrawer";
 import { useCart } from "@/context/CartContext";
 import { DrawerProvider, useDrawer } from "@/context/DrawerContext";
@@ -52,6 +53,15 @@ function TabLayoutInner() {
           }}
         />
         <Tabs.Screen
+          name="favorites"
+          options={{
+            title: "Favorites",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="heart" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="orders"
           options={{
             title: "Orders",
@@ -80,6 +90,7 @@ function TabLayoutInner() {
         />
       </Tabs>
       <MenuDrawer visible={isOpen} onClose={closeDrawer} />
+      <FloatingNavPill />
     </SafeAreaView>
   );
 }

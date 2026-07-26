@@ -25,3 +25,7 @@ export const SHADOW = {
     elevation: 5,
   },
 };
+
+// Bottom padding for scroll/list content on screens the FloatingNavPill
+// floats over, so its last row isn't hidden behind the pill.
+export const FLOATING_NAV_CLEARANCE = 90;

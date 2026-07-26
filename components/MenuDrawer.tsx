@@ -75,7 +75,7 @@ export default function MenuDrawer({ visible, onClose }: MenuDrawerProps) {
     {
       label: `Favorites (${favorites.length})`,
       icon: "heart-outline",
-      onPress: () => navigateTo("/(tabs)/menu?category=favorite"),
+      onPress: () => navigateTo("/(tabs)/favorites"),
     },
     {
       label: "About",
