@@ -443,6 +443,15 @@ export default function MenuScreen() {
           numColumns={2}
           contentContainerStyle={styles.gridContainer}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.primary}
+              colors={[theme.primary]}
+              progressBackgroundColor={theme.background}
+            />
+          }
           renderItem={({ item }) => (
             <MenuItem
               item={item}

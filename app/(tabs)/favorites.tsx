@@ -6,22 +6,36 @@ import ThemedLoader from "@/components/ThemedLoader";
 import { ThemedView } from "@/components/ThemedView";
 import { FLOATING_NAV_CLEARANCE, SPACING } from "@/constants/spacing";
 import { useFavorites } from "@/context/FavoritesContext";
+import { useThemeColors } from "@/context/ThemeContext";
 import { CatalogItem } from "@/utils/types";
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { RefreshControl, StyleSheet, View } from "react-native";
 
 export default function FavoritesScreen() {
+  const { theme } = useThemeColors();
   const { favorites, toggleFavorite } = useFavorites();
 
   const [menu, setMenu] = useState<CatalogItem[] | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchMenu()
       .then(setMenu)
       .catch(() => setMenu([]));
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      setMenu(await fetchMenu(true));
+    } catch {
+      // Keep showing the previously loaded menu on a failed refresh.
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const items = useMemo(
     () => (menu ?? []).filter((item) => favorites.includes(item.id)),
@@ -44,6 +58,15 @@ export default function FavoritesScreen() {
           numColumns={2}
           contentContainerStyle={styles.gridContainer}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.primary}
+              colors={[theme.primary]}
+              progressBackgroundColor={theme.background}
+            />
+          }
           renderItem={({ item }) => (
             <MenuItem
               item={item}

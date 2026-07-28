@@ -13,7 +13,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MenuItem from "@/components/MenuItem";
 
@@ -27,12 +33,24 @@ export default function CategoryScreen() {
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [menu, setMenu] = useState<CatalogItem[] | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchMenu()
       .then(setMenu)
       .catch(() => setMenu([]));
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      setMenu(await fetchMenu(true));
+    } catch {
+      // Keep showing the previously loaded menu on a failed refresh.
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   // id is a plain route-param string, not a closed CategoryId union — fall
   // back to the raw id itself for a malformed/unexpected deep link instead
@@ -134,6 +152,15 @@ export default function CategoryScreen() {
           numColumns={2}
           contentContainerStyle={styles.gridContainer}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.primary}
+              colors={[theme.primary]}
+              progressBackgroundColor={theme.background}
+            />
+          }
           renderItem={({ item }) => (
             <MenuItem
               item={item}
