@@ -46,7 +46,9 @@ export default function CartScreen() {
     if (cart.length === 0) return "";
 
     const lines = cart.map((item) => {
-      return `${item.quantity}pc - ${item.name} [${item.size}]`;
+      const sweetnessNote = item.sweetness ? ` (Sweetness: ${item.sweetness})` : "";
+      const iceNote = item.ice ? ` (Ice: ${item.ice})` : "";
+      return `${item.quantity}pc - ${item.name} [${item.size}]${sweetnessNote}${iceNote}`;
     });
     return `🧾 ORDER\n\n${lines.join("\n")}
 `;
@@ -106,7 +108,7 @@ export default function CartScreen() {
   };
 
   return (
-    <>
+    <ThemedView style={styles.container} gradient>
       <ScreenHeader
         title="Cart"
         right={
@@ -191,11 +193,14 @@ export default function CartScreen() {
           loading,
         }}
       />
-    </>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   itemCountRow: {
     paddingHorizontal: 16,
     paddingBottom: 8,

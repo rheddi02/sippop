@@ -8,6 +8,7 @@ interface ProductRow {
   category: string;
   image_url: string | null;
   is_active: boolean;
+  has_sweetener: boolean;
 }
 
 interface ProductIngredientRow {
@@ -111,6 +112,7 @@ function toCatalogItems(
       category: group.category,
       sizes,
       ingredientNames,
+      hasSweetener: primary.has_sweetener,
     };
   });
 }
@@ -125,7 +127,7 @@ export async function fetchMenu(forceRefresh = false): Promise<CatalogItem[]> {
   const [productsResult, ingredientsResult] = await Promise.all([
     supabase
       .from("products")
-      .select("id,name,price,category,image_url,is_active")
+      .select("id,name,price,category,image_url,is_active,has_sweetener")
       .eq("is_active", true),
     supabase.rpc("get_admin_product_ingredients"),
   ]);

@@ -39,6 +39,8 @@ export interface CatalogItem {
   // size-variant rows), so search can match e.g. "coffee" against "Oreo
   // Latte" without it being in the product name.
   ingredientNames: string[];
+  // Admin-controlled — most drinks have it, but not all (e.g. Soda, Milk).
+  hasSweetener: boolean;
 }
 
 // Product type (used in menu, cart, orders)
@@ -52,6 +54,10 @@ export interface Product {
   // The real POS product row this cart item was built from — needed by
   // place_order() to look up an authoritative, server-verified price.
   productId: string;
+  // Only set when non-default ("Original" sweetness / "Normal" ice), so
+  // checkout text generation can just check truthiness.
+  sweetness?: string;
+  ice?: string;
 }
 
 // Cart item type

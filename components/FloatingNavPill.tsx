@@ -65,7 +65,12 @@ export default function FloatingNavPill() {
       pointerEvents="box-none"
       style={[styles.wrapper, { paddingBottom: insets.bottom + SPACING.md }]}
     >
-      <View style={[styles.pill, { backgroundColor: theme.text }]}>
+      <View
+        style={[
+          styles.pill,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
         {ENTRIES.map((entry) => {
           const active = pathname === entry.match;
           return (
@@ -73,13 +78,19 @@ export default function FloatingNavPill() {
               key={entry.key}
               onPress={() => router.push(entry.route as never)}
               hitSlop={8}
-              style={styles.entry}
+              style={[
+                styles.entry,
+                active && [
+                  styles.entryActive,
+                  { backgroundColor: `${theme.primary}26` },
+                ],
+              ]}
             >
               <View>
                 <Ionicons
                   name={active ? entry.iconActive : entry.iconInactive}
                   size={22}
-                  color={active ? theme.primary : theme.background}
+                  color={active ? theme.primary : theme.muted}
                 />
                 {entry.key === "cart" && cartCount > 0 && (
                   <View
@@ -116,8 +127,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: RADIUS.pill,
-    paddingHorizontal: SPACING.xl,
-    paddingVertical: SPACING.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
     gap: SPACING.xxl,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -128,10 +140,16 @@ const styles = StyleSheet.create({
   entry: {
     flexDirection: "row",
     alignItems: "center",
-    gap: SPACING.xs,
+    gap: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.pill,
+  },
+  entryActive: {
+    paddingHorizontal: SPACING.lg,
   },
   label: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "600",
   },
   badge: {

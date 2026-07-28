@@ -58,7 +58,7 @@ export default function CategoryScreen() {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: theme.background }]}>
+    <ThemedView style={styles.container} gradient>
       <View
         style={[
           styles.header,

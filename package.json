@@ -51,7 +51,9 @@
     "react-navigation": "^5.0.0",
     "expo-crypto": "~15.0.9",
     "@shopify/flash-list": "2.0.2",
-    "expo-linear-gradient": "~15.0.8"
+    "expo-linear-gradient": "~15.0.8",
+    "expo-blur": "~15.0.8",
+    "expo-dev-client": "~6.0.21"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
