@@ -10,6 +10,7 @@ import { ThemedText } from "./ThemedText";
 
 interface NavEntry {
   key: string;
+  label: string;
   route: string;
   match: string;
   iconActive: keyof typeof Ionicons.glyphMap;
@@ -19,6 +20,7 @@ interface NavEntry {
 const ENTRIES: NavEntry[] = [
   {
     key: "menu",
+    label: "Menu",
     route: "/(tabs)/menu",
     match: "/menu",
     iconActive: "restaurant",
@@ -26,6 +28,7 @@ const ENTRIES: NavEntry[] = [
   },
   {
     key: "cart",
+    label: "Cart",
     route: "/(tabs)/cart",
     match: "/cart",
     iconActive: "cart",
@@ -33,6 +36,7 @@ const ENTRIES: NavEntry[] = [
   },
   {
     key: "orders",
+    label: "Orders",
     route: "/(tabs)/orders",
     match: "/orders",
     iconActive: "receipt",
@@ -40,17 +44,11 @@ const ENTRIES: NavEntry[] = [
   },
   {
     key: "favorites",
+    label: "Favorites",
     route: "/(tabs)/favorites",
     match: "/favorites",
     iconActive: "heart",
     iconInactive: "heart-outline",
-  },
-  {
-    key: "profile",
-    route: "/(tabs)/profile",
-    match: "/profile",
-    iconActive: "person",
-    iconInactive: "person-outline",
   },
 ];
 
@@ -75,11 +73,12 @@ export default function FloatingNavPill() {
               key={entry.key}
               onPress={() => router.push(entry.route as never)}
               hitSlop={8}
+              style={styles.entry}
             >
               <View>
                 <Ionicons
                   name={active ? entry.iconActive : entry.iconInactive}
-                  size={30}
+                  size={22}
                   color={active ? theme.primary : theme.background}
                 />
                 {entry.key === "cart" && cartCount > 0 && (
@@ -92,6 +91,11 @@ export default function FloatingNavPill() {
                   </View>
                 )}
               </View>
+              {active && (
+                <ThemedText style={[styles.label, { color: theme.primary }]}>
+                  {entry.label}
+                </ThemedText>
+              )}
             </TouchableOpacity>
           );
         })}
@@ -120,6 +124,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 10,
+  },
+  entry: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.xs,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
   },
   badge: {
     position: "absolute",

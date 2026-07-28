@@ -6,7 +6,7 @@ import { ThemedView } from "@/components/ThemedView";
 
 export default function ProfileScreen() {
   return (
-    <ThemedView style={{ flex: 1 }}>
+    <ThemedView style={{ flex: 1 }} gradient>
       <ScreenHeader title="About" />
       <ThemedView
         style={{
@@ -14,6 +14,7 @@ export default function ProfileScreen() {
           justifyContent: "center",
           alignItems: "center",
           padding: 20,
+          backgroundColor: "transparent",
         }}
       >
         <ThemedText type="title">A&Y Sippop</ThemedText>

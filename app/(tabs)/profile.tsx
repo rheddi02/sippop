@@ -7,14 +7,16 @@ import { ThemedCard } from "@/components/ThemedCard";
 import { ThemedText } from "@/components/ThemedText";
 import ThemedTextInput from "@/components/ThemedTextInput";
 import { ThemedView } from "@/components/ThemedView";
+import ThemeSelectSheet, { ThemeSwatch } from "@/components/ThemeSelectSheet";
 import { useThemeColors } from "@/context";
 import { useProfile } from "@/hooks/useProfile";
 import { useUser } from "@/hooks/useUser";
 import { formatPesoForCart } from "@/utils/amountHelper";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 export default function ProfileScreen() {
   const {
@@ -26,9 +28,11 @@ export default function ProfileScreen() {
     changePassword,
   } = useUser();
   const { profile, loading: profileLoading, reload } = useProfile();
-  const { theme, isDark, toggleTheme, isSystemTheme, resetToSystemTheme } =
-    useThemeColors();
+  const { theme, themeId, themes, setThemeId } = useThemeColors();
   const router = useRouter();
+
+  const [themeSheetVisible, setThemeSheetVisible] = useState(false);
+  const activeTheme = themes.find((t) => t.id === themeId) ?? themes[0];
 
   const [resendState, setResendState] = useState<
     "idle" | "sending" | "sent" | "error"
@@ -101,7 +105,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ThemedView style={{ flex: 1 }}>
+    <ThemedView style={{ flex: 1 }} gradient>
       <ScreenHeader title="Profile" />
       <ProtectedRoute
         fallback={
@@ -109,7 +113,7 @@ export default function ProfileScreen() {
         }
       >
         <ScrollView
-          style={{ flex: 1, backgroundColor: theme.background }}
+          style={{ flex: 1, backgroundColor: "transparent" }}
           contentContainerStyle={styles.container}
         >
           <ThemedText type="subtitle" style={styles.email}>
@@ -258,23 +262,34 @@ export default function ProfileScreen() {
 
           <ThemedCard style={styles.card}>
             <ThemedText type="defaultSemiBold">Theme</ThemedText>
-            <ThemedText type="caption" style={{ color: theme.muted }}>
-              Current: {isDark ? "Dark" : "Light"}{" "}
-              {isSystemTheme ? "(System)" : "(Manual)"}
-            </ThemedText>
             <Spacer height={10} />
-            <ThemedButton
-              title={isDark ? "Switch to Light" : "Switch to Dark"}
-              variant="outline"
-              onPress={toggleTheme}
-            />
-            {!isSystemTheme && (
-              <ThemedButton
-                title="Reset to System Theme"
-                variant="text"
-                onPress={resetToSystemTheme}
-              />
-            )}
+            <Pressable
+              style={[styles.row, styles.themeTrigger, { borderColor: theme.border }]}
+              onPress={() => setThemeSheetVisible(true)}
+            >
+              <View style={styles.aboutLabelRow}>
+                <ThemeSwatch colors={activeTheme.swatch} />
+                <ThemedText type="defaultSemiBold">{activeTheme.name}</ThemedText>
+              </View>
+              <Ionicons name="chevron-down" size={18} color={theme.muted} />
+            </Pressable>
+          </ThemedCard>
+
+          <ThemedCard style={styles.card}>
+            <Pressable
+              style={styles.row}
+              onPress={() => router.push("/(tabs)/about")}
+            >
+              <View style={styles.aboutLabelRow}>
+                <Ionicons
+                  name="information-circle-outline"
+                  size={20}
+                  color={theme.text}
+                />
+                <ThemedText type="defaultSemiBold">About</ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={theme.muted} />
+            </Pressable>
           </ThemedCard>
 
           <Spacer height={10} />
@@ -287,6 +302,13 @@ export default function ProfileScreen() {
           <Spacer height={20} />
         </ScrollView>
       </ProtectedRoute>
+      <ThemeSelectSheet
+        visible={themeSheetVisible}
+        onClose={() => setThemeSheetVisible(false)}
+        themes={themes}
+        activeThemeId={themeId}
+        onSelect={setThemeId}
+      />
     </ThemedView>
   );
 }
@@ -306,5 +328,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  themeTrigger: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  aboutLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
 });

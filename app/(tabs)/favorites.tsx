@@ -6,7 +6,6 @@ import ThemedLoader from "@/components/ThemedLoader";
 import { ThemedView } from "@/components/ThemedView";
 import { FLOATING_NAV_CLEARANCE, SPACING } from "@/constants/spacing";
 import { useFavorites } from "@/context/FavoritesContext";
-import { useThemeColors } from "@/context/ThemeContext";
 import { CatalogItem } from "@/utils/types";
 import { FlashList } from "@shopify/flash-list";
 import { router } from "expo-router";
@@ -14,7 +13,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 export default function FavoritesScreen() {
-  const { theme } = useThemeColors();
   const { favorites, toggleFavorite } = useFavorites();
 
   const [menu, setMenu] = useState<CatalogItem[] | null>(null);
@@ -31,7 +29,7 @@ export default function FavoritesScreen() {
   );
 
   return (
-    <ThemedView style={[styles.container, { backgroundColor: theme.background }]}>
+    <ThemedView style={styles.container} gradient>
       <ScreenHeader title="Favorites" />
 
       {menu === null ? (

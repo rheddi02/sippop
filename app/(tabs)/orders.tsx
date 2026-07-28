@@ -31,7 +31,7 @@ export default function OrdersScreen() {
 
   return (
     <>
-      <ThemedView style={styles.container}>
+      <ThemedView style={styles.container} gradient>
         <ScreenHeader title="Orders" />
         <FlatList
           data={orders}

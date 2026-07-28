@@ -1,206 +1,62 @@
-import { darkColors, lightColors } from "@/theme/colors";
+import { AppTheme, DEFAULT_THEME_ID, THEMES, ThemeColors } from "@/theme/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Constants from "expo-constants";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { Appearance, Platform } from "react-native";
 
 interface ThemeContextType {
-  theme: typeof darkColors | typeof lightColors;
+  theme: ThemeColors;
+  themeId: string;
   isDark: boolean;
-  toggleTheme: () => void;
-  isSystemTheme: boolean;
-  resetToSystemTheme: () => void;
-  forceSystemThemeDetection: () => void;
+  themes: AppTheme[];
+  setThemeId: (id: string) => void;
+  backgroundGradient: [string, string];
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-const THEME_STORAGE_KEY = "@sippop_theme_preference";
+const THEME_STORAGE_KEY = "@sippop_theme_id";
+
+function resolveTheme(id: string): AppTheme {
+  return THEMES.find((t) => t.id === id) ?? THEMES[0];
+}
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [isDark, setIsDark] = useState(false);
-  const [isSystemTheme, setIsSystemTheme] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [themeId, setThemeIdState] = useState(DEFAULT_THEME_ID);
 
-  // Initialize theme on app start
   useEffect(() => {
-    const initializeTheme = async () => {
+    const loadThemeId = async () => {
       try {
-        const appTheme = Constants.expoConfig?.userInterfaceStyle;
-        const systemColorScheme = Appearance.getColorScheme();
-        
-        // Check if user has manually set a preference
-        const savedPreference = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-        
-        if (savedPreference) {
-          // User has manually set a preference
-          const { isDark: savedIsDark, isSystemTheme: savedIsSystemTheme } = JSON.parse(savedPreference);
-          setIsDark(savedIsDark);
-          setIsSystemTheme(savedIsSystemTheme);
-        } else {
-          // No saved preference, use system theme if app is set to automatic
-          if (appTheme === "automatic") {
-            // For Android, we need to be more careful about theme detection
-            let shouldUseDark = false;
-            
-            if (Platform.OS === "android") {
-              // Android-specific theme detection
-              if (systemColorScheme === "dark") {
-                shouldUseDark = true;
-              } else if (systemColorScheme === "light") {
-                shouldUseDark = false;
-              } else {
-                // Fallback: check if we're in a dark environment
-                // This is a workaround for Android devices that don't report theme properly
-                shouldUseDark = false; // Default to light theme
-              }
-            } else {
-              // iOS theme detection
-              shouldUseDark = systemColorScheme === "dark";
-            }
-            
-            setIsDark(shouldUseDark);
-            setIsSystemTheme(true);
-          } else {
-            setIsDark(appTheme === "dark");
-            setIsSystemTheme(false);
-          }
+        const savedId = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        if (savedId && THEMES.some((t) => t.id === savedId)) {
+          setThemeIdState(savedId);
         }
       } catch (error) {
-        console.error("Error initializing theme:", error);
-        // Fallback to system theme
-        const systemColorScheme = Appearance.getColorScheme();
-        setIsDark(systemColorScheme === "dark");
-        setIsSystemTheme(true);
-      } finally {
-        setIsInitialized(true);
+        console.error("Error loading theme preference:", error);
       }
     };
 
-    initializeTheme();
+    loadThemeId();
   }, []);
 
-  // Listen for system theme changes (only when using system theme)
-  useEffect(() => {
-    if (!isInitialized) return;
-
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      if (isSystemTheme) {
-        let shouldUseDark = false;
-        
-        if (Platform.OS === "android") {
-          // Android-specific handling
-          if (colorScheme === "dark") {
-            shouldUseDark = true;
-          } else if (colorScheme === "light") {
-            shouldUseDark = false;
-          } else {
-            return;
-          }
-        } else {
-          // iOS handling
-          shouldUseDark = colorScheme === "dark";
-        }
-        
-        setIsDark(shouldUseDark);
-      }
+  const setThemeId = (id: string) => {
+    setThemeIdState(id);
+    AsyncStorage.setItem(THEME_STORAGE_KEY, id).catch((error) => {
+      console.error("Error saving theme preference:", error);
     });
-
-    return () => subscription?.remove();
-  }, [isSystemTheme, isInitialized]);
-
-  const toggleTheme = async () => {
-    const newIsDark = !isDark;
-    const newIsSystemTheme = false; // Manual toggle means no longer following system
-    
-    setIsDark(newIsDark);
-    setIsSystemTheme(newIsSystemTheme);
-    
-    // Save preference
-    try {
-      await AsyncStorage.setItem(THEME_STORAGE_KEY, JSON.stringify({
-        isDark: newIsDark,
-        isSystemTheme: newIsSystemTheme
-      }));
-    } catch (error) {
-      console.error("Error saving theme preference:", error);
-    }
   };
 
-  const resetToSystemTheme = async () => {
-    const systemColorScheme = Appearance.getColorScheme();
-    
-    let newIsDark = false;
-    
-    if (Platform.OS === "android") {
-      // Android-specific theme detection
-      if (systemColorScheme === "dark") {
-        newIsDark = true;
-      } else if (systemColorScheme === "light") {
-        newIsDark = false;
-      } else {
-        // Fallback for unclear Android theme detection
-        newIsDark = false;
-      }
-    } else {
-      // iOS theme detection
-      newIsDark = systemColorScheme === "dark";
-    }
-    
-    const newIsSystemTheme = true;
-    
-    setIsDark(newIsDark);
-    setIsSystemTheme(newIsSystemTheme);
-    
-    // Save preference
-    try {
-      await AsyncStorage.setItem(THEME_STORAGE_KEY, JSON.stringify({
-        isDark: newIsDark,
-        isSystemTheme: newIsSystemTheme
-      }));
-    } catch (error) {
-      console.error("Error saving theme preference:", error);
-    }
-  };
-
-  const forceSystemThemeDetection = async () => {
-    
-    // Clear any saved preferences to force system detection
-    try {
-      await AsyncStorage.removeItem(THEME_STORAGE_KEY);
-    } catch (error) {
-      console.error("Error clearing theme preferences:", error);
-    }
-    
-    // Re-initialize theme detection
-    const systemColorScheme = Appearance.getColorScheme();
-    
-    let newIsDark = false;
-    
-    if (Platform.OS === "android") {
-      // Android-specific theme detection
-      if (systemColorScheme === "dark") {
-        newIsDark = true;
-      } else if (systemColorScheme === "light") {
-        newIsDark = false;
-      } else {
-        // For Android, if we can't detect, let's try a different approach
-        // We'll default to light but log the issue
-        newIsDark = false;
-      }
-    } else {
-      // iOS theme detection
-      newIsDark = systemColorScheme === "dark";
-    }
-    
-    setIsDark(newIsDark);
-    setIsSystemTheme(true);
-  };
-
-  const theme = isDark ? darkColors : lightColors;
+  const activeTheme = resolveTheme(themeId);
 
   return (
-    <ThemeContext.Provider value={{ theme, isDark, toggleTheme, isSystemTheme, resetToSystemTheme, forceSystemThemeDetection }}>
+    <ThemeContext.Provider
+      value={{
+        theme: activeTheme.colors,
+        themeId: activeTheme.id,
+        isDark: activeTheme.isDark,
+        themes: THEMES,
+        setThemeId,
+        backgroundGradient: activeTheme.backgroundGradient,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

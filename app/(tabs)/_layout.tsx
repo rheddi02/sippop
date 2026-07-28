@@ -1,20 +1,20 @@
 import FloatingNavPill from "@/components/FloatingNavPill";
-import MenuDrawer from "@/components/MenuDrawer";
 import { useCart } from "@/context/CartContext";
-import { DrawerProvider, useDrawer } from "@/context/DrawerContext";
 import { useThemeColors } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-function TabLayoutInner() {
-  const { theme } = useThemeColors();
+export default function TabLayout() {
+  const { theme, backgroundGradient } = useThemeColors();
   const { cart } = useCart();
-  const { isOpen, closeDrawer } = useDrawer();
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradient colors={backgroundGradient} style={StyleSheet.absoluteFill} />
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -89,16 +89,7 @@ function TabLayoutInner() {
           }}
         />
       </Tabs>
-      <MenuDrawer visible={isOpen} onClose={closeDrawer} />
       <FloatingNavPill />
     </SafeAreaView>
-  );
-}
-
-export default function TabLayout() {
-  return (
-    <DrawerProvider>
-      <TabLayoutInner />
-    </DrawerProvider>
   );
 }
